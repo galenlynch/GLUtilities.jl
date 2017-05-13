@@ -5,6 +5,7 @@ module GLUtilities
 export
     add_time_and_micros,
     time_range_to_sec,
+    matlab_datevec_to_datetime,
     check_overlap,
     clipind
 
