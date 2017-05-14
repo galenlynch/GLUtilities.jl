@@ -2,7 +2,7 @@ using GLUtilities
 using Base.Test
 
 @testset "GLUtilities"  begin
-    @testset "indicies" begin
+    @testset "indices" begin
         @test clipind(-1, 2) == 1
         @test clipind(3, 2) == 2
         @test clipind(1, 2) == 1
