@@ -11,6 +11,6 @@ export
 
 include("times.jl")
 include("ranges.jl")
-include("indicies.jl")
+include("indices.jl")
 
 end # module
