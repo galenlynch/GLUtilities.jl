@@ -7,6 +7,7 @@ using Base.Test
         @test clipind(3, 2) == 2
         @test clipind(1, 2) == 1
         @test clipind(2, 2) == 2
+        @test clipind(Int32(1), Int64(2)) == 1
     end
 
     @testset "times" begin
