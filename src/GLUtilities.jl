@@ -8,7 +8,14 @@ export
     matlab_datevec_to_datetime,
     check_overlap,
     clipind,
-    dir_match_files
+    dir_match_files,
+    x_to_ndx,
+    ndx_to_x,
+    n_ndx,
+    n_points_duration,
+    index_offset,
+    bin_bounds,
+    bin_center
 
 include("times.jl")
 include("ranges.jl")
