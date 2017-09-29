@@ -13,12 +13,13 @@ export
     ndx_to_x,
     n_ndx,
     n_points_duration,
+    duration,
     index_offset,
     bin_bounds,
     bin_center
 
 include("times.jl")
-include("ranges.jl")
+include("interval.jl")
 include("indices.jl")
 include("files.jl")
 

@@ -12,6 +12,14 @@ n_ndx(start_idx::Integer, stop_idx::Integer) = stop_idx - start_idx + 1
 
 n_points_duration(npoints::Integer, fs::Real) = (npoints - 1) / fs
 
+function duration(npoints::Integer, fs::T, offset::T) where T<:AbstractFloat
+    return (offset, offset + n_points_duration(npoints, fs))
+end
+function duration(n::Integer, fs::Real, offset::Real = 0)
+    return duration(n, convert(Float64, fs), convert(Float64, offset))
+end
+duration(a::AbstractVector, args...) = duration(length(a), args...)
+
 """
     index_offset(start_idx, offset)
 
