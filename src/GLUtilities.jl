@@ -9,6 +9,7 @@ export
     check_overlap,
     clipind,
     dir_match_files,
+    dir_find_files,
     x_to_ndx,
     ndx_to_x,
     n_ndx,
@@ -17,11 +18,13 @@ export
     index_offset,
     bin_bounds,
     bin_center,
-    reduce_extrema
+    reduce_extrema,
+    only_matches
 
 include("times.jl")
 include("interval.jl")
 include("indices.jl")
 include("files.jl")
+include("strings.jl")
 
 end # module
