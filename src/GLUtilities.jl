@@ -16,7 +16,8 @@ export
     duration,
     index_offset,
     bin_bounds,
-    bin_center
+    bin_center,
+    reduce_extrema
 
 include("times.jl")
 include("interval.jl")
