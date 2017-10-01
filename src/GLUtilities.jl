@@ -3,13 +3,22 @@ module GLUtilities
 
 # package code goes here
 export
+    # Constants
+    POSTGRES_DATE_FORMAT,
+    MICRO_FORMAT,
+
+    # Functions
+    ## Time stuff
     add_time_and_micros,
     time_range_to_sec,
     matlab_datevec_to_datetime,
+    postgres_time_str,
+
+    ## Interval stuff
     check_overlap,
+
+    ## Indices stuff
     clipind,
-    dir_match_files,
-    dir_find_files,
     x_to_ndx,
     ndx_to_x,
     n_ndx,
@@ -18,13 +27,22 @@ export
     index_offset,
     bin_bounds,
     bin_center,
-    reduce_extrema,
-    only_matches
+
+    ## String stuff
+    only_matches,
+
+    ## File system stuff
+    dir_match_files,
+    dir_find_files,
+
+    ## Misc
+    reduce_extrema
 
 include("times.jl")
 include("interval.jl")
 include("indices.jl")
 include("files.jl")
 include("strings.jl")
+include("postgres.jl")
 
 end # module
