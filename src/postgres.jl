@@ -1,4 +1,4 @@
-const POSTGRES_DATE_FORMAT = "YYYY-mm-dd HH:MM:SS.sss"
+const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SS.sss"
 const MICRO_FORMAT = FormatExpr("{1:s}{2:03d}")
 
 function postgres_time_str(dt::DateTime, micros::Integer = 0)

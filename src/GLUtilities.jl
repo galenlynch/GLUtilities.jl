@@ -1,6 +1,8 @@
 __precompile__()
 module GLUtilities
 
+using Formatting
+
 # package code goes here
 export
     # Constants
@@ -36,7 +38,8 @@ export
     dir_find_files,
 
     ## Misc
-    reduce_extrema
+    reduce_extrema,
+    postgres_time_str
 
 include("times.jl")
 include("interval.jl")
