@@ -20,7 +20,7 @@ export
     check_overlap,
 
     ## Indices stuff
-    clipind,
+    clip_ndx,
     t_to_ndx,
     ndx_to_t,
     n_ndx,

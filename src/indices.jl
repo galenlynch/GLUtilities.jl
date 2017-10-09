@@ -12,7 +12,7 @@ t_to_ndx(A::AbstractArray, args...) = t_to_ndx.(A, args...)
 
 "Clips an index to be within the valid range for an array of length l"
 function clip_ndx end
-clip_ndx(ind::T, l::T) where T = min(max(ind, T(1)), l)
+clip_ndx(ind::T, l::T) where T<:Integer = min(max(ind, T(1)), l)
 clip_ndx(ind::Integer, l::Integer) = clip_ndx(promote(ind, l)...)
 
 n_ndx(start_idx::Integer, stop_idx::Integer) = stop_idx - start_idx + 1
