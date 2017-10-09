@@ -3,23 +3,23 @@ using Base.Test
 
 @testset "GLUtilities"  begin
     @testset "indices" begin
-        @test clipind(-1, 2) == 1
-        @test clipind(3, 2) == 2
-        @test clipind(1, 2) == 1
-        @test clipind(2, 2) == 2
-        @test clipind(Int32(1), Int64(2)) == 1
+        @test clip_ndx(-1, 2) == 1
+        @test clip_ndx(3, 2) == 2
+        @test clip_ndx(1, 2) == 1
+        @test clip_ndx(2, 2) == 2
+        @test clip_ndx(Int32(1), Int64(2)) == 1
 
-        @test ndx_to_x(1, 1, 0) == 0
-        @test ndx_to_x(30000, 30000, 0) == 29999 / 30000
-        @test ndx_to_x(1, 1, 20) == 20
-        @test ndx_to_x(1:2, 1, 0) == 0.0:1.0:1.0
-        @test ndx_to_x(1:1, 1, 20) == 20.0:1.0:20.0
-        @test ndx_to_x([1, 2], 1, 0) == [0, 1]
+        @test ndx_to_t(1, 1, 0) == 0
+        @test ndx_to_t(30000, 30000, 0) == 29999 / 30000
+        @test ndx_to_t(1, 1, 20) == 20
+        @test ndx_to_t(1:2, 1, 0) == 0.0:1.0:1.0
+        @test ndx_to_t(1:1, 1, 20) == 20.0:1.0:20.0
+        @test ndx_to_t([1, 2], 1, 0) == [0, 1]
 
-        @test x_to_ndx(1, 30000, 0) == 30001
-        @test x_to_ndx(1, 30000, 1) == 1
-        @test x_to_ndx(1:2, 1, 0) == [2, 3]
-        @test x_to_ndx([1, 2], 1, 0) ==[2, 3]
+        @test t_to_ndx(1, 30000, 0) == 30001
+        @test t_to_ndx(1, 30000, 1) == 1
+        @test t_to_ndx(1:2, 1, 0) == [2, 3]
+        @test t_to_ndx([1, 2], 1, 0) ==[2, 3]
 
         @test n_ndx(1, 1) == 1
         @test n_ndx(1, 2) == 2
@@ -27,10 +27,10 @@ using Base.Test
         @test n_points_duration(2, 1) == 1.0
         @test n_points_duration(30001, 30000) == 1.0
 
-        @test index_offset(1, 1) == 1
-        @test index_offset(1, 2) == 2
-        @test index_offset(1, 0) == 0
-        @test index_offset(3, -3) == 1
+        @test ndx_offset(1, 1) == 1
+        @test ndx_offset(1, 2) == 2
+        @test ndx_offset(1, 0) == 0
+        @test ndx_offset(3, -3) == 1
 
         @test bin_bounds(1, 1024) == (1, 1024)
         @test bin_bounds(2, 1024) == (1025, 2048)

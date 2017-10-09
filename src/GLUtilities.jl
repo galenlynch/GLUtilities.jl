@@ -21,12 +21,12 @@ export
 
     ## Indices stuff
     clipind,
-    x_to_ndx,
-    ndx_to_x,
+    t_to_ndx,
+    ndx_to_t,
     n_ndx,
     n_points_duration,
     duration,
-    index_offset,
+    ndx_offset,
     bin_bounds,
     bin_center,
 
