@@ -46,12 +46,12 @@ duration(a::AbstractVector, args...) = duration(length(a), args...)
 function bin_bounds end
 # Intended to work with binno as an integer or ranges
 # though I can't figure out how to express that
-function bin_bounds(binno, binsize::Integer)
+function bin_bounds(binno, binsize::Real)
     idx_start = (binno - 1) * binsize + 1
     idx_stop = idx_start + binsize - 1
     return (idx_start, idx_stop)
 end
-function bin_bounds(binno::Integer, binsize::Integer, max_ndx::Integer)
+function bin_bounds(binno::Real, binsize::Real, max_ndx::Real)
     bounds = bin_bounds(binno, binsize)
     clipped_bounds = min.(bounds, max_ndx)
     return clipped_bounds
@@ -59,7 +59,7 @@ end
 
 "Find the center index of a bin"
 function bin_center end
-bin_center(i::Integer, args...) = mean(bin_bounds(i, args...))
+bin_center(i::Real, args...) = mean(bin_bounds(i, args...))
 bin_center(rs::NTuple{2, R}) where R<:Range = (rs[1] + rs[2]) / 2
-bin_center(r::Range, binsize::Integer) = bin_center(bin_bounds(r, binsize))
-bin_center(a::A) where {S<:Integer, T<: NTuple{2, S}, A<:AbstractArray{T}} = mean.(a)
+bin_center(r::Range, binsize::Real) = bin_center(bin_bounds(r, binsize))
+bin_center(a::A) where {S<:Real, T<: NTuple{2, S}, A<:AbstractArray{T}} = mean.(a)
