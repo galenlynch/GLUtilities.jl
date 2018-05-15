@@ -46,7 +46,7 @@ duration(a::AbstractVector, args...) = duration(length(a), args...)
 function bin_bounds end
 # Intended to work with binno as an integer or ranges
 # though I can't figure out how to express that
-function bin_bounds(binno, binsize::Real)
+function bin_bounds(binno::Union{AbstractUnitRange{<:Integer}, Integer}, binsize::Real)
     idx_start = (binno - 1) * binsize + 1
     idx_stop = idx_start + binsize - 1
     return (idx_start, idx_stop)
