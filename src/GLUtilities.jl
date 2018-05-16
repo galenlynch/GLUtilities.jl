@@ -39,6 +39,7 @@ export
 
     ## Misc
     reduce_extrema,
+    extrema_red,
     postgres_time_str
 
 include("times.jl")
