@@ -2,6 +2,15 @@ using GLUtilities
 using Base.Test
 
 @testset "GLUtilities"  begin
+    @testset "types" begin
+        @test div_type(Int) == Float64
+        @test div_type(Int, Int) == Float64
+        @test div_type(Float32) == Float32
+        @test div_type(Float32, Int) == Float32
+        @test div_type(Float32, Float64) == Float64
+        @test div_type(2, 5) == Float64
+        @test div_type(1.0f0, 1) == Float32
+    end
     @testset "indices" begin
         @test clip_ndx(-1, 2) == 1
         @test clip_ndx(3, 2) == 2

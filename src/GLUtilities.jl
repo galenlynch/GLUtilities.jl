@@ -10,6 +10,9 @@ export
     MICRO_FORMAT,
 
     # Functions
+    ## Promotion helper
+    div_type,
+
     ## Time stuff
     add_time_and_micros,
     time_range_to_sec,
@@ -42,6 +45,7 @@ export
     extrema_red,
     postgres_time_str
 
+include("types.jl")
 include("times.jl")
 include("interval.jl")
 include("indices.jl")
