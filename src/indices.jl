@@ -129,3 +129,12 @@ function bin_center(a::AbstractArray{<:NTuple{2, <:Integer}, <:Any})
     dest = similar(a, Float64)
     bin_center!(dest, a)
 end
+
+function make_slice_idx(
+    ndims::Integer, dimno::Integer, idx::T
+) where {T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
+    idxes = Array{Union{Colon, T}}(ndims)
+    idxes[:] = Colon()
+    idxes[dimno] = idx
+    return idxes
+end

@@ -32,6 +32,7 @@ export
     ndx_offset,
     bin_bounds,
     bin_center,
+    make_slice_idx,
 
     ## String stuff
     only_matches,

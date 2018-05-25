@@ -49,6 +49,10 @@ using Base.Test
         @test bin_center(1, 1024) == 512.5
         @test bin_center([(1, 1024)]) == [512.5]
         @test bin_center(1:2, 1024) == 512.5:1024.0:1536.5
+
+        @test make_slice_idx(2, 1, 1) == Union{Colon, Int}[1, :]
+        @test make_slice_idx(2, 1, 2) == Union{Colon, Int}[2, :]
+        @test make_slice_idx(3, 1, 1:2) == Union{Colon, UnitRange{Int}}[1:2, :, :]
     end
 
     @testset "times" begin
