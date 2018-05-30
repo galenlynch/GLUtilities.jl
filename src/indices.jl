@@ -47,10 +47,18 @@ function ndx_to_t(i::Real, fs::Real, start_t::Real)
 end
 
 
-"Converts a time in a regularly sampled time series to its index"
+"""
+    t_to_ndx()
+
+Converts a time in a regularly sampled time series to its index. Returns the
+index of the first sample at or after the time specified
+
+"""
 function t_to_ndx end
-function t_to_ndx(x::Real, fs::Real, start_t::Real = zero(fs), T::DataType = Int)
-    convert(T, floor((x - start_t) * fs) + one(T))
+function t_to_ndx(
+    x::Real, fs::Real, start_t::Real = zero(fs), T::DataType = Int
+)
+    ceil(T, (x - start_t) * fs) + one(T)
 end
 function t_to_ndx!(dest::AbstractArray, A::AbstractArray, args...)
     dest .= t_to_ndx.(A, args...)
@@ -58,6 +66,31 @@ end
 function t_to_ndx(a::AbstractArray, fs, start_t = zero(fs), T::DataType = Int)
     dest = similar(a, T)
     t_to_ndx!(dest, a, fs, start_t)
+end
+
+"Like t_to_ndx, but returns sample at or before time"
+function t_to_last_ndx(
+    x::Real, fs::Real, start_t::Real = zero(fs), T::DataType = Int
+)
+    floor(T, (x - start_t) * fs) + one(T)
+end
+function t_to_last_ndx!(dest::AbstractArray, A::AbstractArray, args...)
+    dest .= t_to_last_ndx.(A, args...)
+end
+function t_to_last_ndx(a::AbstractArray, fs, start_t = zero(fs), T::DataType = Int)
+    dest = similar(a, T)
+    t_to_last_ndx!(dest, a, fs, start_t)
+end
+
+"""
+    t_sup_to_ndx()
+
+Converts a time in a regularly sampled time series to the index of the last
+sample before the specified time.
+"""
+function t_sup_to_ndx(args...)
+    ndx = t_to_ndx(args...)
+    ndx - one(ndx)
 end
 
 "Clips an index to be within the valid range for an array of length l"

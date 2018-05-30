@@ -25,6 +25,8 @@ export
     ## Indices stuff
     clip_ndx,
     t_to_ndx,
+    t_to_last_ndx,
+    t_sup_to_ndx,
     ndx_to_t,
     n_ndx,
     duration,
