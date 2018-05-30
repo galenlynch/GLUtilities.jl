@@ -100,6 +100,18 @@ clip_ndx(ind::Integer, l::Integer) = clip_ndx(promote(ind, l)...)
 
 n_ndx(start_idx::T, stop_idx::T) where {T<:Integer} = stop_idx - start_idx + one(T)
 
+function expand_selection(ib::T, ie::T, imax::T, expansion::T) where T<:Integer
+    ib_exp = max(one(T), ib - expansion)
+    ie_exp = min(ie + expansion, imax)
+    return (ib_exp, ie_exp)
+end
+
+function expand_selection(
+    ib::Integer, ie::Integer, imax::Integer, expansion::Integer
+)
+    expand_selection(promote(ib, ie, imax, expansion)...)
+end
+
 """
     ndx_offset(start_ndx, npt)
 
@@ -169,5 +181,5 @@ function make_slice_idx(
     idxes = Array{Union{Colon, T}}(ndims)
     idxes[:] = Colon()
     idxes[dimno] = idx
-    return idxes
+    return (idxes...)
 end

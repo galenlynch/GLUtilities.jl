@@ -24,6 +24,7 @@ export
 
     ## Indices stuff
     clip_ndx,
+    expand_selection,
     t_to_ndx,
     t_to_last_ndx,
     t_sup_to_ndx,
