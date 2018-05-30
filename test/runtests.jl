@@ -33,8 +33,8 @@ using Base.Test
         @test n_ndx(1, 1) == 1
         @test n_ndx(1, 2) == 2
 
-        @test n_points_duration(2, 1) == 1.0
-        @test n_points_duration(30001, 30000) == 1.0
+        @test duration(2, 1) == 1.0
+        @test duration(30001, 30000) == 1.0
 
         @test ndx_offset(1, 1) == 1
         @test ndx_offset(1, 2) == 2

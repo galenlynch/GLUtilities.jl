@@ -80,17 +80,17 @@ function ndx_offset(start_ndx::T, npt::T) where {T<:Integer}
     return start_ndx + npt + adjust;
 end
 
-n_points_duration(npoints::Integer, fs::Real) = (npoints - 1) / fs
+duration(npoints::Integer, fs::Real) = (npoints - 1) / fs
 
-"Find the duration of a regularly sampled time series"
-function duration end
-function duration(npoints::Integer, fs::T, start_t::T) where T<:AbstractFloat
-    return (start_t, start_t + n_points_duration(npoints, fs))
+"Find the time_interval of a regularly sampled time series"
+function time_interval end
+function time_interval(npoints::Integer, fs::T, start_t::T) where T<:AbstractFloat
+    return (start_t, start_t + duration(npoints, fs))
 end
-function duration(n::Integer, fs::Real, start_t::Real = zero(fs))
-    return duration(n, convert(Float64, fs), convert(Float64, start_t))
+function time_interval(n::Integer, fs::Real, start_t::Real = zero(fs))
+    return time_interval(n, convert(Float64, fs), convert(Float64, start_t))
 end
-duration(a::AbstractVector, args...) = duration(length(a), args...)
+time_interval(a::AbstractVector, args...) = time_interval(length(a), args...)
 
 "Find the indices to select all points in a bin"
 function bin_bounds end
