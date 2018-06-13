@@ -8,9 +8,11 @@ function reduce_extrema(s::NTuple{2, T}, t::NTuple{2, T}) where T<:Number
 end
 
 extrema_red(a::AbstractVector{<:Number}) = extrema(a)
+
 function extrema_red(a::AbstractArray{<:Number, 2})
     na = size(a, 2)
     na > 0 || throw(ArgumentError("Collection must not be empty"))
+    size(a, 1) == 2 || throw(ArgumentError("First dimension must be size 2"))
     cmin = a[1, 1]
     cmax = a[2, 1]
     for i in 2:na
