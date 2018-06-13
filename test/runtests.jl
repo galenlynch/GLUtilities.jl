@@ -72,6 +72,12 @@ using Base.Test
         @test !check_overlap(1, 3, 4, 5)
     end
 
+    @testset "array" begin
+        A = rand(3, 3)
+        B = rand(3)
+        weighted_mean_dim(A, B)
+    end
+
     @testset "equality" begin
         A = ones(3, 3)
         @test allsame(A)

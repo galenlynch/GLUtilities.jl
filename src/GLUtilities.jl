@@ -51,7 +51,11 @@ export
     ## Misc
     reduce_extrema,
     extrema_red,
-    postgres_time_str
+    postgres_time_str,
+
+    ## Array stuff
+    weighted_mean,
+    weighted_mean_dim
 
 include("types.jl")
 include("times.jl")
@@ -61,5 +65,6 @@ include("files.jl")
 include("strings.jl")
 include("equality.jl")
 include("postgres.jl")
+include("array.jl")
 
 end # module
