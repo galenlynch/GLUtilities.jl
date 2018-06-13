@@ -53,6 +53,9 @@ using Base.Test
         @test make_slice_idx(2, 1, 1) == (1, :)
         @test make_slice_idx(2, 1, 2) == (2, :)
         @test make_slice_idx(3, 1, 1:2) == (1:2, :, :)
+
+        @test make_expand_idx(2, 1) == (:, 1)
+        @test make_expand_idx(2, 2) == (1, :)
     end
 
     @testset "times" begin

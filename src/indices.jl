@@ -183,3 +183,10 @@ function make_slice_idx(
     idxes[dimno] = idx
     return (idxes...)
 end
+
+function make_expand_idx(ndims::Integer, dimno::Integer)
+    idxes = Array{Union{Colon, Int}}(ndims)
+    idxes[:] = 1
+    idxes[dimno] = Colon()
+    return (idxes...)
+end

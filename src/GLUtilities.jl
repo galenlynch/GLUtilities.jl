@@ -36,6 +36,7 @@ export
     bin_bounds,
     bin_center,
     make_slice_idx,
+    make_expand_idx,
 
     ## String stuff
     only_matches,
