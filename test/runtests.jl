@@ -68,4 +68,11 @@ using Base.Test
         @test check_overlap(1, 3, 2, 3)
         @test !check_overlap(1, 3, 4, 5)
     end
+
+    @testset "equality" begin
+        A = ones(3, 3)
+        @test allsame(A)
+        A[1] = 0
+        @test ! allsame(A)
+    end
 end

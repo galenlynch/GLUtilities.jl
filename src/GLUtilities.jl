@@ -44,6 +44,9 @@ export
     dir_match_files,
     dir_find_files,
 
+    ## equality checking
+    allsame,
+
     ## Misc
     reduce_extrema,
     extrema_red,
@@ -55,6 +58,7 @@ include("interval.jl")
 include("indices.jl")
 include("files.jl")
 include("strings.jl")
+include("equality.jl")
 include("postgres.jl")
 
 end # module
