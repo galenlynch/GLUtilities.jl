@@ -190,3 +190,11 @@ function make_expand_idx(ndims::Integer, dimno::Integer)
     idxes[dimno] = Colon()
     return (idxes...)
 end
+
+"copy_length_check returns true if dest can accept all data from source"
+function copy_length_check end
+
+copy_length_check(n_dest::Integer, n_source::Integer) = n_dest >= n_source
+function copy_length_check(dest::AbstractArray, source::AbstractArray)
+    copy_length_check(length(dest), length(source))
+end

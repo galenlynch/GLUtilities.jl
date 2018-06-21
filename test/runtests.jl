@@ -56,6 +56,11 @@ using Base.Test
 
         @test make_expand_idx(2, 1) == (:, 1)
         @test make_expand_idx(2, 2) == (1, :)
+
+        @test copy_length_check(5, 1)
+        @test ! copy_length_check(1, 5)
+        @test copy_length_check(rand(5), rand(1))
+        @test ! copy_length_check(rand(1), rand(5))
     end
 
     @testset "times" begin
