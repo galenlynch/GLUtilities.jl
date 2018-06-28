@@ -88,5 +88,10 @@ using Base.Test
         @test allsame(A)
         A[1] = 0
         @test ! allsame(A)
+
+        @test allsame(1, 1)
+        @test ! allsame(1, 2)
+        @test allsame(1)
+        @test allsame(length, (1,2), (3, 4))
     end
 end
