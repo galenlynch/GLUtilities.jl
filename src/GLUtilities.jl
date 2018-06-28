@@ -56,7 +56,11 @@ export
 
     ## Array stuff
     weighted_mean,
-    weighted_mean_dim
+    weighted_mean_dim,
+
+    ## Testing
+    redirect_io,
+    @redirect_io
 
 include("types.jl")
 include("times.jl")
@@ -67,5 +71,6 @@ include("strings.jl")
 include("equality.jl")
 include("postgres.jl")
 include("array.jl")
+include("testing.jl")
 
 end # module
