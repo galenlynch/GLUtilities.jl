@@ -81,6 +81,11 @@ using Base.Test
         A = rand(3, 3)
         B = rand(3)
         weighted_mean_dim(A, B)
+
+        C = [2, 1, 2, 3, 2]
+        @test local_extrema(C) == [4]
+        @test local_extrema(C, <) == [2]
+        @test local_extrema(C[1:4]) == []
     end
 
     @testset "equality" begin

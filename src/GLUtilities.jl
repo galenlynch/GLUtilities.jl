@@ -57,6 +57,7 @@ export
     ## Array stuff
     weighted_mean,
     weighted_mean_dim,
+    local_extrema,
 
     ## Testing
     redirect_io,

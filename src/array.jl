@@ -54,3 +54,22 @@ function weighted_mean(
     end
     return reduced / total_weight
 end
+
+function local_extrema(s::AbstractVector, comp::Function = >)
+    ns = length(s)
+    idxes = Vector{Int}(div(ns, 2))
+    out_i = 0
+    if ns > 2
+        @inbounds last_comp = comp(s[1], s[2])
+        for i in 2:(ns - 1)
+            @inbounds this_comp = comp(s[i], s[i + 1])
+            if this_comp && ! last_comp
+                out_i += 1
+                @inbounds idxes[out_i] = i
+            end
+            last_comp = this_comp
+        end
+    end
+    resize!(idxes, out_i)
+    idxes
+end
