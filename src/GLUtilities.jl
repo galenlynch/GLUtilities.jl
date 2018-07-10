@@ -1,6 +1,8 @@
 __precompile__()
 module GLUtilities
 
+import Base: cov
+
 using Formatting
 
 # package code goes here

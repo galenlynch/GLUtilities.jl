@@ -73,3 +73,31 @@ function local_extrema(s::AbstractVector, comp::Function = >)
     resize!(idxes, out_i)
     idxes
 end
+
+function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
+    allsame(length, as) || throw(ArgumentError("Lengths must be the same"))
+    na = length(as)
+    S = div_type(T)
+    cov = zeros(S, na, na)
+    if na > 0
+        means = Vector{S}(na)
+        scratch = Vector{S}(na)
+        @inbounds for (i, a) in enumerate(as)
+            means[i] = mean(a)
+        end
+
+        nx = length(as[1])
+        for xno = 1:nx
+            @simd for arrno = 1:na
+                @inbounds scratch[arrno] = as[arrno][xno] - means[arrno]
+            end
+            for i = 1:na
+                @simd for j = i:na
+                    @inbounds cov[i, j] += scratch[i] * scratch[j]
+                end
+            end
+        end
+        cov ./= nx - 1
+    end
+    UpperTriangular(cov)
+end

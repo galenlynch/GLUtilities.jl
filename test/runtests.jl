@@ -86,6 +86,12 @@ using Base.Test
         @test local_extrema(C) == [4]
         @test local_extrema(C, <) == [2]
         @test local_extrema(C[1:4]) == []
+
+        A = rand(20)
+        B = rand(20)
+        C = rand(20)
+
+        cov([A,B,C])
     end
 
     @testset "equality" begin
