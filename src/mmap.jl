@@ -12,8 +12,8 @@ function typemmap(
     end
     return (arr, path::String)
 end
-function typemmap(a::AbstractArray{T, N}; kwargs...) where {T, N}
-    typemmap(Array{T, N}, size(a); kwargs...)
+function typemmap(a::AbstractArray{T, N}, args...; kwargs...) where {T, N}
+    typemmap(Array{T, N}, size(a), args...; kwargs...)
 end
 
 function to_mmap(a::AbstractArray, kwargs...)
