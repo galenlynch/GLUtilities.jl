@@ -97,6 +97,10 @@ using Base.Test
         cov([A,B,C])
     end
 
+    @testset "mmap" begin
+        (arr, path) = typemmap(Vector{Int}, (2,); cleanup=false)
+    end
+
     @testset "equality" begin
         A = ones(3, 3)
         @test allsame(A)

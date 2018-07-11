@@ -62,6 +62,10 @@ export
     local_extrema,
     rev_view,
 
+    ## Mmap stuff
+    typemmap,
+    to_mmap,
+
     ## Testing
     redirect_io,
     @redirect_io
@@ -76,5 +80,6 @@ include("equality.jl")
 include("postgres.jl")
 include("array.jl")
 include("testing.jl")
+include("mmap.jl")
 
 end # module
