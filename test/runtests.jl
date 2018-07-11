@@ -80,6 +80,9 @@ using Base.Test
     @testset "array" begin
         A = rand(3, 3)
         B = rand(3)
+
+        @test all(B[end:-1:1] .== rev_view(B))
+
         weighted_mean_dim(A, B)
 
         C = [2, 1, 2, 3, 2]

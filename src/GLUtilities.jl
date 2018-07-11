@@ -60,6 +60,7 @@ export
     weighted_mean,
     weighted_mean_dim,
     local_extrema,
+    rev_view,
 
     ## Testing
     redirect_io,

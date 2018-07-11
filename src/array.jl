@@ -101,3 +101,5 @@ function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
     end
     UpperTriangular(cov)
 end
+
+rev_view(a::AbstractVector) = @view a[end:-1:1]
