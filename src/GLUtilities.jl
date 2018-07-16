@@ -23,6 +23,7 @@ export
 
     ## Interval stuff
     check_overlap,
+    interval_intersect,
 
     ## Indices stuff
     clip_ndx,
@@ -40,6 +41,7 @@ export
     bin_center,
     make_slice_idx,
     make_expand_idx,
+    view_trailing_slice,
 
     ## String stuff
     only_matches,

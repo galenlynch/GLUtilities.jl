@@ -175,6 +175,23 @@ function bin_center(a::AbstractArray{<:NTuple{2, <:Integer}, <:Any})
     bin_center!(dest, a)
 end
 
+@generated function view_trailing_slice(
+    a::Array{<:Any, N}, idx::T
+) where {N, T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
+    view_trailing_slice_impl(a, idx)
+end
+
+function view_trailing_slice_impl(
+    a::Type{<:AbstractArray{<:Any, N}}, idx::Type{T}
+) where {T, N}
+    exprargs = Vector{Any}(N + 2)
+    exprargs[1] = :view
+    exprargs[2] = :a
+    exprargs[3:end - 1] = :(Colon())
+    exprargs[end] = :idx
+    Expr(:call, exprargs...)
+end
+
 function make_slice_idx(
     ndims::Integer, dimno::Integer, idx::T
 ) where {T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}

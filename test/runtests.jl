@@ -75,6 +75,8 @@ using Base.Test
     @testset "ranges" begin
         @test check_overlap(1, 3, 2, 3)
         @test !check_overlap(1, 3, 4, 5)
+        @test interval_intersect(1, 3, 4, 5) == Int[]
+        @test interval_intersect(1, 4, 3, 5) == [3, 4]
     end
 
     @testset "array" begin
