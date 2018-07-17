@@ -176,7 +176,7 @@ function bin_center(a::AbstractArray{<:NTuple{2, <:Integer}, <:Any})
 end
 
 @generated function view_trailing_slice(
-    a::Array{<:Any, N}, idx::T
+    a::AbstractArray{<:Any, N}, idx::T
 ) where {N, T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
     view_trailing_slice_impl(a, idx)
 end
@@ -211,7 +211,28 @@ end
 "copy_length_check returns true if dest can accept all data from source"
 function copy_length_check end
 
-copy_length_check(n_dest::Integer, n_source::Integer) = n_dest >= n_source
-function copy_length_check(dest::AbstractArray, source::AbstractArray)
-    copy_length_check(length(dest), length(source))
+function copy_length_dest_check(
+    n_dest::Integer,
+    d_off::Integer,
+    n::Integer
+)
+    n_dest >= d_off && n_ndx(d_off, n_dest) >= n
+end
+function copy_length_check(
+    n_dest::Integer,
+    n_source::Integer,
+    d_off::Integer = 1,
+    s_off::Integer = 1,
+    n::Integer = n_ndx(s_off, n_source)
+)
+    source_ok = n_source >= s_off && n_ndx(s_off, n_source) >= n
+    source_ok && copy_length_dest_check(n_dest, d_off, n)
+end
+
+function copy_length_check(dest::AbstractArray, source::AbstractArray, args...)
+    copy_length_check(length(dest), length(source), args...)
+end
+
+function copy_length_check(dest::AbstractArray, d_off::Integer, source::AbstractArray, s_off::Integer, args...)
+    copy_length_check(dest, source, d_off, s_off, args...)
 end
