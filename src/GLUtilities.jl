@@ -33,6 +33,7 @@ export
     t_to_last_ndx,
     t_sup_to_ndx,
     ndx_to_t,
+    ndx_wrap,
     n_ndx,
     duration,
     time_interval,

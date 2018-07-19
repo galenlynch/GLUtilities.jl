@@ -70,6 +70,10 @@ using Base.Test
 
         @test matlab_datevec_to_datetime(Float64[2017, 05, 14, 13, 53, 22.222]) ==
             DateTime(2017, 05, 14, 13, 53, 22, 222)
+
+        @test ndx_wrap(1, 5) == 1
+        @test ndx_wrap(6, 5) == 1
+        @test ndx_wrap(5, 5) == 5
     end
 
     @testset "ranges" begin

@@ -236,3 +236,7 @@ end
 function copy_length_check(dest::AbstractArray, d_off::Integer, source::AbstractArray, s_off::Integer, args...)
     copy_length_check(dest, source, d_off, s_off, args...)
 end
+
+function ndx_wrap(i::T, max_ndx::Integer) where T<:Integer
+    mod(i - one(T), T(max_ndx)) + one(T)
+end
