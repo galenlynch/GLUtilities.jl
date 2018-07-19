@@ -1,16 +1,15 @@
 "Make a mmaped array of type A"
 function typemmap(
-    ::Type{A}, dims::NTuple{N, Int}, basedir::AbstractString = tempdir();
+    ::Type{A},
+    dims::NTuple{N, Int};
+    basedir::AbstractString = tempdir(),
+    suffix::AbstractString = "",
+    fpath::AbstractString = joinpath(basedir, basename(tempname()) * suffix),
     cleanup::Bool = true
 ) where {A<:AbstractArray, N}
-    (path, io) = mktemp(basedir)
-    cleanup && atexit(()->rm(path))
-    arr = try
-        Mmap.mmap(io, A, dims; grow = true)
-    finally
-        close(io)
-    end
-    return (arr, path::String)
+    arr = Mmap.mmap(fpath, A, dims; grow = true)
+    cleanup && atexit(()->rm(fpath))
+    arr, fpath
 end
 function typemmap(a::AbstractArray{T, N}, args...; kwargs...) where {T, N}
     typemmap(Array{T, N}, size(a), args...; kwargs...)
