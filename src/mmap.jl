@@ -5,10 +5,10 @@ function typemmap(
     basedir::AbstractString = tempdir(),
     suffix::AbstractString = "",
     fpath::AbstractString = joinpath(basedir, basename(tempname()) * suffix),
-    cleanup::Bool = true
+    autoclean::Bool = true
 ) where {A<:AbstractArray, N}
     arr = Mmap.mmap(fpath, A, dims; grow = true)
-    cleanup && atexit(()->rm(fpath))
+    autoclean && atexit(()->rm(fpath))
     arr, fpath
 end
 function typemmap(a::AbstractArray{T, N}, args...; kwargs...) where {T, N}
