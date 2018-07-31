@@ -2,9 +2,9 @@
 function typemmap(
     ::Type{A},
     dims::NTuple{N, Int};
-    basedir::AbstractString = tempdir(),
-    suffix::AbstractString = "",
-    fpath::AbstractString = joinpath(basedir, basename(tempname()) * suffix),
+    basedir::String = tempdir(),
+    suffix::String = "",
+    fpath::String = joinpath(basedir, basename(tempname()) * suffix),
     autoclean::Bool = true
 ) where {A<:AbstractArray, N}
     arr = Mmap.mmap(fpath, A, dims; grow = true)

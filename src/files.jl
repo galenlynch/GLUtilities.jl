@@ -7,3 +7,7 @@ function dir_match_files(reg::Regex, dir::AbstractString = ".")
     files = readdir(dir)
     return only_matches(reg, files)
 end
+
+function dir_match_files(reg::Regex, files::AbstractVector{<:AbstractString})
+    only_matches(reg, files)
+end
