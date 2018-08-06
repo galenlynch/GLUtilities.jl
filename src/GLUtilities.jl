@@ -68,6 +68,7 @@ export
     ## Mmap stuff
     typemmap,
     to_mmap,
+    file_arr_size,
 
     ## Testing
     redirect_io,

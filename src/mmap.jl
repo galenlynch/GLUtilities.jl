@@ -20,3 +20,10 @@ function to_mmap(a::AbstractArray, kwargs...)
     copy!(mma, a)
     mma, path
 end
+
+function file_arr_size(file_str::AbstractString, file_eltype::DataType)
+    finfo = stat(file_str)
+    el_sizes = sizeof(file_eltype)
+    convert(Int, finfo.size / el_sizes)
+end
+

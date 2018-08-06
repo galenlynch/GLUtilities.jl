@@ -104,7 +104,12 @@ using Base.Test
     end
 
     @testset "mmap" begin
-        (arr, path) = typemmap(Vector{Int}, (2,); cleanup=false)
+        test_len = 5
+        (arr, path) = typemmap(Vector{Int}, (2,); cleanup=true)
+        A = rand(test_len)
+        (mma, path) = to_mmap(A)
+        @test all(mma .== A)
+        @test file_arr_size(path, eltype(A)) == test_len
     end
 
     @testset "equality" begin
