@@ -1,9 +1,15 @@
 __precompile__()
 module GLUtilities
 
-import Base: cov
+using Compat, Formatting
 
-using Formatting
+@static if VERSION >= v"0.7.0-DEV.2575"
+    using Dates, LinearAlgebra, Compat, Statistics, Mmap
+    import Statistics: cov
+else
+    import Base: cov
+end
+
 
 # package code goes here
 export

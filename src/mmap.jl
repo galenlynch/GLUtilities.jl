@@ -11,13 +11,14 @@ function typemmap(
     autoclean && atexit(()->rm(fpath))
     arr, fpath
 end
+
 function typemmap(a::AbstractArray{T, N}, args...; kwargs...) where {T, N}
     typemmap(Array{T, N}, size(a), args...; kwargs...)
 end
 
 function to_mmap(a::AbstractArray, kwargs...)
     mma, path = typemmap(a; kwargs...)
-    copy!(mma, a)
+    @compat copyto!(mma, a)
     mma, path
 end
 

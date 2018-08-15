@@ -3,12 +3,20 @@ function ndx_to_t end
 function ndx_to_t(
     i::AbstractUnitRange, fs::R, start_t::R = zero(fs)
 ) where {R<:Real}
-    (i - 1) / fs + start_t
+    @static if VERSION < v"0.7.0-DEV.2005"
+        (i - 1) / fs + start_t
+    else
+        (i .- 1) ./ fs .+ start_t
+    end
 end
 function ndx_to_t(
     i::AbstractUnitRange, fs::R, start_t::R = zero(fs)
 ) where R<:Integer
-    (i - 1) / fs + start_t
+    @static if VERSION < v"0.7.0-DEV.2005"
+        (i - 1) / fs + start_t
+    else
+        (i .- 1) ./ fs .+ start_t
+    end
 end
 function ndx_to_t(i::Real, fs::R, start_t::R = zero(fs)) where {R<:Real}
     (i - 1) / fs + start_t
@@ -26,13 +34,13 @@ function ndx_to_t(
     fs::R,
     start_t::R = zero(fs)
 ) where {R<:Integer}
-    ts = Vector{Float64}(length(A))
+    @compat ts = Vector{Float64}(undef, length(A))
     ndx_to_t!(ts, A, fs, start_t)
 end
 function ndx_to_t(
     A::AbstractArray{R, <:Any}, fs::R, start_t::R = zero(fs)
 ) where {R<:AbstractFloat}
-    ts = Vector{R}(length(A))
+    @compat ts = Vector{R}(undef, length(A))
     ndx_to_t!(ts, A, fs, start_t)
 end
 function ndx_to_t(
@@ -144,8 +152,13 @@ function bin_bounds end
 function bin_bounds(binno::Union{AbstractUnitRange{T}, T}, binsize::S) where
     {T<:Integer, S<:Integer}
     R = promote_type(T,S)
-    idx_start = (binno - one(R)) * binsize + one(R)
-    idx_stop = idx_start + binsize - one(R)
+    @static if VERSION < v"0.7.0-DEV.2005"
+        idx_start = (binno - one(R)) * binsize + one(R)
+        idx_stop = idx_start + binsize - one(R)
+    else
+        idx_start = (binno .- one(R)) .* binsize .+ one(R)
+        idx_stop = idx_start .+ binsize .- one(R)
+    end
     return (idx_start, idx_stop)
 end
 function bin_bounds(binno::Real, binsize::Real, max_ndx::Real)
@@ -158,8 +171,8 @@ end
 function bin_center end
 bin_center(idxs::NTuple{2, <:Real}) = mean(idxs)
 bin_center(i::Real, args...) = bin_center(bin_bounds(i, args...))
-bin_center(rs::NTuple{2, R}) where R<:Range = (rs[1] + rs[2]) / 2
-bin_center(r::Range, binsize::Real) = bin_center(bin_bounds(r, binsize))
+bin_center(rs::NTuple{2, R}) where R<:Compat.AbstractRange = (rs[1] + rs[2]) / 2
+bin_center(r::Compat.AbstractRange, binsize::Real) = bin_center(bin_bounds(r, binsize))
 function bin_center!(
     dest::AbstractArray{<:AbstractFloat, <:Any},
     a::AbstractArray{<:NTuple{2, <:Real}}
@@ -178,16 +191,16 @@ end
 @generated function view_trailing_slice(
     a::AbstractArray{<:Any, N}, idx::T
 ) where {N, T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
-    view_trailing_slice_impl(a, idx)
+    view_trailing_slice_impl(a)
 end
 
 function view_trailing_slice_impl(
-    a::Type{<:AbstractArray{<:Any, N}}, idx::Type{T}
-) where {T, N}
-    exprargs = Vector{Any}(N + 2)
+    a::Type{<:AbstractArray{<:Any, N}}
+) where {N}
+    @compat exprargs = Vector{Any}(undef, N + 2)
     exprargs[1] = :view
     exprargs[2] = :a
-    exprargs[3:end - 1] = :(Colon())
+    exprargs[3:end - 1] .= Ref(:(Colon()))
     exprargs[end] = :idx
     Expr(:call, exprargs...)
 end
@@ -195,17 +208,17 @@ end
 function make_slice_idx(
     ndims::Integer, dimno::Integer, idx::T
 ) where {T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
-    idxes = Array{Union{Colon, T}}(ndims)
-    idxes[:] = Colon()
+    @compat idxes = Array{Union{Colon, T}}(undef, ndims)
+    idxes[:] .= Colon()
     idxes[dimno] = idx
-    return (idxes...)
+    return (idxes...,)
 end
 
 function make_expand_idx(ndims::Integer, dimno::Integer)
-    idxes = Array{Union{Colon, Int}}(ndims)
-    idxes[:] = 1
+    @compat idxes = Array{Union{Colon, Int}}(undef, ndims)
+    idxes[:] .= 1
     idxes[dimno] = Colon()
-    return (idxes...)
+    return (idxes...,)
 end
 
 "copy_length_check returns true if dest can accept all data from source"

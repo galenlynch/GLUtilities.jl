@@ -15,7 +15,7 @@ function time_range_to_sec(tstart::DateTime, microstart::Integer, tend::DateTime
     return total_micros / 1000000
 end
 
-function matlab_datevec_to_datetime{T<:Real}(datevec::Array{T})
+function matlab_datevec_to_datetime(datevec::Array{T}) where {T<:Real}
     secs = datevec[6]
     rounded_secs = floor(secs)
     millis = round(mod(1000 * secs, 1000))

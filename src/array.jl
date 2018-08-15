@@ -10,7 +10,7 @@ function weighted_mean_dim(
     dims[dim] = 1
 
     slice_idx = collect(make_slice_idx(N, dim, 1))
-    reduced = zeros(F, (dims...))
+    reduced = zeros(F, (dims...,))
     for i in 1:size(summand, dim)
         slice_idx[dim] = i
         reduced .+= summand[slice_idx...] .* weights[i]
@@ -57,7 +57,7 @@ end
 
 function local_extrema(s::AbstractVector, comp::Function = >)
     ns = length(s)
-    idxes = Vector{Int}(div(ns, 2))
+    @compat idxes = Vector{Int}(undef, div(ns, 2))
     out_i = 0
     if ns > 2
         @inbounds last_comp = comp(s[1], s[2])
@@ -80,8 +80,8 @@ function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
     S = div_type(T)
     cov = zeros(S, na, na)
     if na > 0
-        means = Vector{S}(na)
-        scratch = Vector{S}(na)
+        @compat means = Vector{S}(undef, na)
+        @compat scratch = Vector{S}(undef, na)
         @inbounds for (i, a) in enumerate(as)
             means[i] = mean(a)
         end

@@ -1,5 +1,10 @@
-using GLUtilities
-using Base.Test
+using Compat, GLUtilities
+
+@static if VERSION >= v"0.7.0-DEV.2575"
+    using Dates, LinearAlgebra, Compat, Statistics, Test, Mmap
+else
+    using Base.Test
+end
 
 @testset "GLUtilities"  begin
     @testset "types" begin
@@ -61,6 +66,7 @@ using Base.Test
         @test ! copy_length_check(1, 5)
         @test copy_length_check(rand(5), rand(1))
         @test ! copy_length_check(rand(1), rand(5))
+        GLUtilities.view_trailing_slice_impl(Array{Int, 2})
     end
 
     @testset "times" begin
@@ -105,7 +111,7 @@ using Base.Test
 
     @testset "mmap" begin
         test_len = 5
-        (arr, path) = typemmap(Vector{Int}, (2,); cleanup=true)
+        (arr, path) = typemmap(Vector{Int}, (2,); autoclean=true)
         A = rand(test_len)
         (mma, path) = to_mmap(A)
         @test all(mma .== A)
@@ -122,5 +128,10 @@ using Base.Test
         @test ! allsame(1, 2)
         @test allsame(1)
         @test allsame(length, (1,2), (3, 4))
+    end
+
+    @testset "files" begin
+        dir_find_files(r"")
+        dir_match_files(r"")
     end
 end

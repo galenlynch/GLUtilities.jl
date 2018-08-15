@@ -1,13 +1,9 @@
-function dir_find_files(reg::Regex, dir::AbstractString = ".")
+function dir_find_files(reg::Regex, dir::AbstractString = pwd())
     files = readdir(dir)
-    return filter((x) -> ismatch(reg, x), files)
+    return filter((x) -> occursin(reg, x), files)
 end
 
-function dir_match_files(reg::Regex, dir::AbstractString = ".")
+function dir_match_files(reg::Regex, dir::AbstractString = pwd())
     files = readdir(dir)
     return only_matches(reg, files)
-end
-
-function dir_match_files(reg::Regex, files::AbstractVector{<:AbstractString})
-    only_matches(reg, files)
 end
