@@ -27,6 +27,7 @@ export
     matlab_datevec_to_datetime,
     postgres_time_str,
     postgres_datetime_micros,
+    matlab_datestring,
 
     ## Interval stuff
     check_overlap,
@@ -93,5 +94,6 @@ include("postgres.jl")
 include("array.jl")
 include("testing.jl")
 include("mmap.jl")
+include("matlab.jl")
 
 end # module
