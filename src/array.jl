@@ -103,3 +103,32 @@ function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
 end
 
 rev_view(a::AbstractVector) = @view a[end:-1:1]
+
+function map_pairwise(
+    f::Function, a::AbstractVector{T}, ::Type{R} = T
+) where {T, R}
+    n = length(a)
+    out = Vector{R}(undef, convert(Int, n * (n - 1) / 2))
+    offset = 0
+    for i = 1:(n-1)
+        @inbounds @simd for j = 1:(n - i)
+            out[offset + j] = f(a[i + j], a[i])
+        end
+        offset += n - i
+    end
+    out
+end
+
+function map_pairwise(
+    f::Function, as::AbstractVector{T}, bs::AbstractVector, ::Type{R} = T
+) where {T, R}
+    na = length(as)
+    nb = length(bs)
+    out = Matrix{R}(undef, nb, na)
+    @inbounds @simd for i = 1:na
+        for j = 1:nb
+            out[j, i] = f(as[i], bs[j])
+        end
+    end
+    out
+end

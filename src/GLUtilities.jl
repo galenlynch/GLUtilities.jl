@@ -71,6 +71,7 @@ export
     weighted_mean_dim,
     local_extrema,
     rev_view,
+    map_pairwise,
 
     ## Mmap stuff
     typemmap,
