@@ -26,6 +26,7 @@ export
     time_range_to_sec,
     matlab_datevec_to_datetime,
     postgres_time_str,
+    postgres_datetime_micros,
 
     ## Interval stuff
     check_overlap,
