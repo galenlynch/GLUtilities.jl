@@ -1,4 +1,6 @@
-function add_time_and_micros(base_datetime::DateTime, dur_sec::Real, base_micros::Integer = 0)
+function add_time_and_micros(
+    base_datetime::DateTime, dur_sec::Real, base_micros::Integer = 0
+)
     micro_mult = 1000000 # 10^6
     milli_mult = 1000 # 10^3
     dur_micros = round(Int, dur_sec * micro_mult)
@@ -8,7 +10,9 @@ function add_time_and_micros(base_datetime::DateTime, dur_sec::Real, base_micros
     return (joined_dt, rem_micros)
 end
 
-function time_range_to_sec(tstart::DateTime, microstart::Integer, tend::DateTime, microend::Integer)
+function time_range_to_sec(
+    tstart::DateTime, microstart::Integer, tend::DateTime, microend::Integer
+)
     dmillis = Dates.Millisecond(tend - tstart).value
     dmicros = dmillis * 1000
     total_micros = dmicros + (microend - microstart)
