@@ -17,7 +17,7 @@ function typemmap(a::AbstractArray{T, N}, args...; kwargs...) where {T, N}
 end
 
 function to_mmap(a::AbstractArray, arrtype::DataType = typeof(a); kwargs...)
-    mma, path = typemmap(arrtype; kwargs...)
+    mma, path = typemmap(arrtype, size(a); kwargs...)
     @compat copyto!(mma, a)
     mma, path
 end

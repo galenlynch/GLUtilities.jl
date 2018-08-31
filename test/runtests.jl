@@ -70,7 +70,7 @@ end
     end
 
     @testset "times" begin
-        @test add_time_and_micros(DateTime(2013, 7, 1), 1) == (DateTime(2013, 7, 1, 0, 0, 1), 0)
+        @test add_seconds(DateTime(2013, 7, 1), 1) == PreciseDateTime(DateTime(2013, 7, 1, 0, 0, 1))
 
         @test time_range_to_sec(DateTime(2013, 7, 1, 0, 0, 0), 0, DateTime(2013, 7, 1, 0, 0, 1), 0) == 1
 

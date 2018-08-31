@@ -3,6 +3,8 @@ module GLUtilities
 
 using Compat, Formatting
 
+import Base: isless, print
+
 @static if VERSION >= v"0.7.0-DEV.2575"
     using Dates, LinearAlgebra, Compat, Statistics, Mmap
     import Statistics: cov
@@ -22,12 +24,16 @@ export
     div_type,
 
     ## Time stuff
-    add_time_and_micros,
+    PreciseDateTime,
+    RangeBound,
+    TSRange,
+    add_seconds,
     time_range_to_sec,
     matlab_datevec_to_datetime,
     postgres_time_str,
     postgres_datetime_micros,
     matlab_datestring,
+    postgres_tsrange_to_datetime_micros,
 
     ## Interval stuff
     check_overlap,
