@@ -83,6 +83,7 @@ export
     local_extrema,
     rev_view,
     map_pairwise,
+    find_subseq,
 
     ## Mmap stuff
     typemmap,

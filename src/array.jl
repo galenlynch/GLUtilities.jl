@@ -132,3 +132,35 @@ function map_pairwise(
     end
     out
 end
+
+function find_subseq(subseq, seq)
+    nsub = length(subseq)
+    nsub > 0 || throw(ArgumentError("subseq cannot be empty"))
+    p = isequal(subseq[1])
+    if nsub == 1
+        return findall(p, seq)
+    end
+    nseq = length(seq)
+    nsub > nseq && return Vector{Int}()
+    max_idx = nseq - nsub + 1
+    @compat imatch = Vector{Int}(undef, max_idx)
+    nmatch = 0
+    idx = 1
+    while (idx = findnext(p, seq, idx)) != nothing
+        idx > max_idx && break
+        ismatch = true
+        @inbounds for i = 2:nsub
+            if seq[idx + i - 1] != subseq[i]
+                ismatch = false
+                break
+            end
+        end
+        if ismatch
+            nmatch += 1
+            imatch[nmatch] = idx
+        end
+        idx += 1
+    end
+    resize!(imatch, nmatch)
+    imatch
+end
