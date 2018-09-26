@@ -41,6 +41,13 @@ export
     ## Interval stuff
     check_overlap,
     interval_intersect,
+    measure,
+    clip_int,
+    join_intervals,
+    interval_compliments,
+    mask_events,
+    find_overlaps,
+    interval_indices,
 
     ## Indices stuff
     clip_ndx,
