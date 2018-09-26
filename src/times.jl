@@ -1,11 +1,18 @@
 struct PreciseDateTime
-    dt::DateTime
-    micros::Int
+    date::Date
+    time::Time
 end
-PreciseDateTime(dt::DateTime) = PreciseDateTime(dt, 0)
+PreciseDateTime(dt::DateTime) = PreciseDateTime(Date(dt), Time(dt))
+function PreciseDateTime(dt::DateTime, micros::Real)
+    add_seconds(PreciseDateTime(dt), micros / 10^6)
+end
+
+DateTime(pdt::PreciseDateTime) = DateTime(pdt.date) + pdt.time.instant
+
+micros(pdt::PreciseDateTime) = Dates.microsecond(pdt.time)
 
 function isless(a::PreciseDateTime, b::PreciseDateTime)
-    a.dt < b.dt || (a.dt == b.dt && a.micros < b.micros)
+    a.date < b.date || (a.date == b.date && a.time < b.time)
 end
 
 function print(io::IO, pdt::PreciseDateTime)
@@ -17,27 +24,24 @@ function print(io::IO, pdt::PreciseDateTime)
 end
 
 function add_seconds(pdt::PreciseDateTime, sec::Real)
-    micro_mult = 1000000 # 10^6
-    milli_mult = 1000 # 10^3
-    dur_micros = round(Int, sec * micro_mult)
-    all_micros = pdt.micros + dur_micros
-    (all_millis, rem_micros) = divrem(all_micros, milli_mult)
-    joined_dt = pdt.dt + Dates.Millisecond(all_millis)
-    return PreciseDateTime(joined_dt, rem_micros)
+    ns_in = ceil(Int, sec * 10^9)
+    (d, ns_comb) = divrem(pdt.time.instant.value + ns_in, 86400000000000)
+    new_d = pdt.date + Dates.Day(d)
+    new_t = Time(Dates.Nanosecond(ns_comb))
+    PreciseDateTime(new_d, new_t)
 end
 add_seconds(dt::DateTime, sec::Real) = add_seconds(PreciseDateTime(dt), sec)
 
-function time_range_to_sec(
-    tstart::DateTime, microstart::Integer, tend::DateTime, microend::Integer
-)
-    dmillis = Dates.Millisecond(tend - tstart).value
-    dmicros = dmillis * 1000
-    total_micros = dmicros + (microend - microstart)
-    return total_micros / 1000000
+function time_range_to_sec(start::PreciseDateTime, stop::PreciseDateTime)
+    ns_diff = Dates.Nanosecond(stop.date - start.date) + (stop.time - start.time)
+    ns_diff.value / 10^9
 end
 
-function time_range_to_sec(start::PreciseDateTime, stop::PreciseDateTime)
-    time_range_to_sec(start.dt, start.micros, stop.dt, stop.micros)
+function time_range_to_sec(
+    tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
+)
+    micro_diff = Dates.Microsecond(tend - tstart).value + (microend - microstart)
+    micro_diff / 10^6
 end
 
 struct RangeBound
@@ -69,4 +73,3 @@ function print(io::IO, r::TSRange)
     print(ioc, r.upper.datetime)
     print(io, rb)
 end
-

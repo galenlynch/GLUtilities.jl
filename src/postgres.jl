@@ -2,6 +2,7 @@ const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SS.sss"
 const MICRO_FORMAT = FormatExpr("{1:s}{2:03d}")
 const PSQL_DATETIME_REG = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.?\d{0,3})(\d*)"
 const PSQL_RANGE_REG = r"([\[\(])\"([^\"]*)\",\s*\"([^\"]*)\"([\)\]])"
+const POSTGRES_ARRAY_REG = r"\{([^\}]*)\}"
 
 function postgres_time_str(dt::DateTime, micros::Integer = 0)
     @assert micros < 1000 "Trailing microseconds only"
@@ -9,7 +10,12 @@ function postgres_time_str(dt::DateTime, micros::Integer = 0)
     return format(MICRO_FORMAT, datetime_str, micros)
 end
 
-postgres_time_str(pdt::PreciseDateTime) = postgres_time_str(pdt.dt, pdt.micros)
+function postgres_time_str(pdt::PreciseDateTime)
+    micros = cld(pdt.time.instant.value, 10^3)
+    (millis, trailing_micros) = divrem(micros, 10^3)
+    dt = DateTime(pdt.date) + Dates.Millisecond(millis)
+    postgres_time_str(dt, trailing_micros)
+end
 
 function PreciseDateTime(datestring::AbstractString)
     m = match(PSQL_DATETIME_REG, datestring)
@@ -56,4 +62,11 @@ function TSRange(rangestr::AbstractString)
         RangeBound(start_t, start_inclusive),
         RangeBound(stop_t, stop_inclusive)
     )
+end
+
+function parse_postgres_array(s::AbstractString)
+    m = match(POSTGRES_ARRAY_REG, s)
+    m == nothing && return nothing
+    content = m[1]
+    strip.(split(content, ',', keepempty = false))
 end

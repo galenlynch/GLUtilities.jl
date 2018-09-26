@@ -7,9 +7,10 @@ import Base: isless, print
 
 @static if VERSION >= v"0.7.0-DEV.2575"
     using Dates, LinearAlgebra, Compat, Statistics, Mmap
+    import Dates: DateTime
     import Statistics: cov
 else
-    import Base: cov
+    import Base: cov, DateTime
 end
 
 
@@ -34,6 +35,8 @@ export
     postgres_datetime_micros,
     matlab_datestring,
     postgres_tsrange_to_datetime_micros,
+    iso_fine_datestring,
+    micros,
 
     ## Interval stuff
     check_overlap,
@@ -72,6 +75,7 @@ export
     reduce_extrema,
     extrema_red,
     postgres_time_str,
+    parse_postgres_array,
 
     ## Array stuff
     weighted_mean,
