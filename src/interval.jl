@@ -1,4 +1,8 @@
-check_overlap(start1, stop1, start2, stop2) = start1 <= stop2 && start2 <= stop1
+check_overlap(start1, stop1, start2, stop2) = (start1 <= stop2) & (start2 <= stop1)
+
+function is_subinterval(startchild, stopchild, startparent, stopparent)
+    (startchild >= startparent) & (stopchild <= stopparent)
+end
 
 function check_overlap(a::AbstractVector{<:NTuple{2, <:Any}})
     na = length(a)

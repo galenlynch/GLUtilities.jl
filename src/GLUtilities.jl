@@ -48,6 +48,7 @@ export
     mask_events,
     find_overlaps,
     interval_indices,
+    is_subinterval,
 
     ## Indices stuff
     clip_ndx,
