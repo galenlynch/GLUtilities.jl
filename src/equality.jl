@@ -16,3 +16,5 @@ function allsame(a::AbstractArray)
     end
     true
 end
+
+anyeq(el, iter) = any(a -> a == el, iter)

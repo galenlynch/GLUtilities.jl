@@ -78,6 +78,7 @@ export
 
     ## equality checking
     allsame,
+    anyeq,
 
     ## Misc
     reduce_extrema,
