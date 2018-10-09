@@ -90,6 +90,7 @@ export
     weighted_mean_dim,
     local_extrema,
     rev_view,
+    pairwise_idxs,
     map_pairwise,
     find_subseq,
 

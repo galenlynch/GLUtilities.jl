@@ -104,6 +104,34 @@ end
 
 rev_view(a::AbstractVector) = @view a[end:-1:1]
 
+"""
+    pairwise_idxs(n::Integer) -> Vector{NTuple{2, Int}}
+
+Returns the possible combinations of `1:n` indices excluding self-pairs.
+The first index is always greater than the second, allowing for easy
+subtraction of ordered lists.
+
+# Examples
+```julia-repl
+julia> pairwise_idxs(3)
+3-element Array{Tuple{Int64,Int64},1}:
+ (2, 1)
+ (3, 1)
+ (3, 2)
+```
+"""
+function pairwise_idxs(n::Integer)
+    idxs = Vector{NTuple{2, Int}}(undef, convert(Int, n * (n - 1) / 2))
+    offset = 0
+    @inbounds for i = 1:(n - 1)
+        @simd for j = 1:(n - i)
+            idxs[offset + j] = (i + j, i)
+        end
+        offset += n - i
+    end
+    idxs
+end
+
 function map_pairwise(
     f::Function, a::AbstractVector{T}, ::Type{R} = T
 ) where {T, R}
