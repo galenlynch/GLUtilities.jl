@@ -34,9 +34,9 @@ end
 
 function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
     if check_overlap(start1, stop1, start2, stop2)
-        res = T[max(start1, start2), min(stop1, stop2)]
+        res = (max(start1, start2), min(stop1, stop2))
     else
-        res = T[]
+        res = nothing
     end
     res
 end
