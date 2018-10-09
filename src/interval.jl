@@ -109,7 +109,7 @@ function join_intervals(
     ints_merged
 end
 
-function interval_compliments(
+function interval_complements(
     start::T,
     stop::T,
     intervals::AbstractVector{<:NTuple{2, T}},
@@ -123,11 +123,11 @@ function interval_compliments(
             return Vector{NTuple{2, T}}()
         end
     end
-    compliment = Vector{NTuple{2, T}}(undef, nint + 1)
+    complement = Vector{NTuple{2, T}}(undef, nint + 1)
     gapno = 0
     if intervals[1][1] - start > contraction
         gapno += 1
-        compliment[gapno] = (
+        complement[gapno] = (
             start + contraction,
             intervals[1][1] - contraction
         )
@@ -135,7 +135,7 @@ function interval_compliments(
     for i in 1:(nint - 1)
         if intervals[i + 1][1] - intervals[i][2] > 2 * contraction
             gapno += 1
-            compliment[gapno] = (
+            complement[gapno] = (
                 intervals[i][2] + contraction,
                 intervals[i + 1][1] - contraction
             )
@@ -143,19 +143,19 @@ function interval_compliments(
     end
     if stop - intervals[end][2] > contraction
         gapno += 1
-        compliment[gapno] = (
+        complement[gapno] = (
             intervals[end][2] + contraction,
             stop - contraction
         )
     end
-    resize!(compliment, gapno)
-    compliment
+    resize!(complement, gapno)
+    complement
 end
 
-function interval_compliments(
+function interval_complements(
     start, stop, intervals::AbstractVector{<:NTuple{2, T}}, args...
 ) where T
-    interval_compliments(convert(T, start), convert(T, stop), intervals, args...)
+    interval_complements(convert(T, start), convert(T, stop), intervals, args...)
 end
 
 function mask_events(event_times::AbstractVector{<:Number}, start, stop)

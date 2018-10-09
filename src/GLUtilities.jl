@@ -44,7 +44,7 @@ export
     measure,
     clip_int,
     join_intervals,
-    interval_compliments,
+    interval_complements,
     mask_events,
     find_overlaps,
     interval_indices,
