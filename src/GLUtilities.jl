@@ -12,6 +12,7 @@ import Base: isless, print
     Compat,
     Statistics,
     Mmap,
+    Random,
     SharedArrays,
     Distributed
 
@@ -113,7 +114,11 @@ export
 
     ## Testing
     redirect_io,
-    @redirect_io
+    @redirect_io,
+
+    ## Random
+    randperm_notsame,
+    mc_twotail_asymm_p
 
 include("types.jl")
 include("times.jl")
@@ -127,5 +132,6 @@ include("array.jl")
 include("testing.jl")
 include("mmap.jl")
 include("matlab.jl")
+include("rand.jl")
 
 end # module
