@@ -192,3 +192,31 @@ function find_subseq(subseq, seq)
     resize!(imatch, nmatch)
     imatch
 end
+
+function subselect(
+    base_vec,
+    idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
+    outtype::Type{T} = Vector{Float32}
+) where T<:AbstractVector
+    nout = length(idx_tup_vec)
+    out = Vector{outtype}(undef, nout)
+    for i = 1:nout
+        ib, ie = idx_tup_vec[i]
+        out[i] = convert(outtype, view(base_vec, ib:ie))
+    end
+    out
+end
+
+function subselect(
+    base_vec,
+    idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
+    outtype::Type{T} = SharedVector{Float32}
+) where T<:SharedVector
+    nout = length(idx_tup_vec)
+    out = Vector{outtype}(undef, nout)
+    for i = 1:nout
+        ib, ie = idx_tup_vec[i]
+        out[i] = outtype(base_vec[ib:ie])
+    end
+    out
+end

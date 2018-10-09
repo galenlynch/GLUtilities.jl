@@ -93,6 +93,7 @@ export
     pairwise_idxs,
     map_pairwise,
     find_subseq,
+    subselect,
 
     ## Mmap stuff
     typemmap,
