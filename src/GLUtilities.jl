@@ -95,6 +95,7 @@ export
     map_pairwise,
     find_subseq,
     subselect,
+    simple_summary_stats,
 
     ## Mmap stuff
     typemmap,

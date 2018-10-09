@@ -220,3 +220,10 @@ function subselect(
     end
     out
 end
+
+function simple_summary_stats(a::AbstractArray)
+    m = mean(a)
+    s = std(a)
+    sem = s / sqrt(length(a))
+    m, s, sem
+end
