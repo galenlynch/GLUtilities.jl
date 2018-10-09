@@ -161,6 +161,11 @@ function map_pairwise(
     out
 end
 
+function pmap_pairwise(f::Function, as::AbstractVector)
+    pairs = pairwise_idxs(length(as))
+    pmap(((x, y),) -> f(as[x], as[y]), pairs)
+end
+
 function find_subseq(subseq, seq)
     nsub = length(subseq)
     nsub > 0 || throw(ArgumentError("subseq cannot be empty"))

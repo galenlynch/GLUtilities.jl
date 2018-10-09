@@ -6,7 +6,15 @@ using Compat, Formatting
 import Base: isless, print
 
 @static if VERSION >= v"0.7.0-DEV.2575"
-    using Dates, LinearAlgebra, Compat, Statistics, Mmap
+    using
+    Dates,
+    LinearAlgebra,
+    Compat,
+    Statistics,
+    Mmap,
+    SharedArrays,
+    Distributed
+
     import Dates: DateTime
     import Statistics: cov
 else
@@ -93,6 +101,7 @@ export
     rev_view,
     pairwise_idxs,
     map_pairwise,
+    pmap_pairwise,
     find_subseq,
     subselect,
     simple_summary_stats,
