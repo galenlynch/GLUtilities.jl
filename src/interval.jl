@@ -164,7 +164,7 @@ function mask_events(event_times::AbstractVector{<:Number}, start, stop)
 end
 
 function interval_indices(
-    basis::Union{<:AbstractVector, AbstractRange}, start, stop
+    basis::Union{<:AbstractVector, AbstractRange}, start::Number, stop::Number
 )
     i_b = searchsortedfirst(basis, start)
     i_e = searchsortedlast(basis, stop)
