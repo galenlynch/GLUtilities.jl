@@ -201,10 +201,12 @@ end
 function subselect(
     base_vec,
     idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
-    outtype::Type{T} = Vector{Float32}
-) where T<:AbstractVector
+    outtype::Type{T} = ifelse(
+        base_vec isa AbstractVector, typeof(base_vec), Vector{eltype(base_vec)}
+    )
+) where {T<:AbstractVector}
     nout = length(idx_tup_vec)
-    out = Vector{outtype}(undef, nout)
+    out = Vector{T}(undef, nout)
     for i = 1:nout
         ib, ie = idx_tup_vec[i]
         out[i] = convert(outtype, view(base_vec, ib:ie))
@@ -215,10 +217,10 @@ end
 function subselect(
     base_vec,
     idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
-    outtype::Type{T} = SharedVector{Float32}
+    outtype::Type{T}
 ) where T<:SharedVector
     nout = length(idx_tup_vec)
-    out = Vector{outtype}(undef, nout)
+    out = Vector{T}(undef, nout)
     for i = 1:nout
         ib, ie = idx_tup_vec[i]
         out[i] = outtype(base_vec[ib:ie])
