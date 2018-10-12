@@ -22,3 +22,18 @@ function mc_twotail_asymm_p(val, nulldist, nnull::Integer = length(nulldist))
     end
     2 * min(nless, nmore) / nnull
 end
+
+function binomial_p_ci(n_success, n_trial, alpha)
+    half_alpha = alpha / 2
+    if n_success == 0
+        lb = 0
+        ub = 1 - half_alpha ^ (1 / n_trial)
+    elseif n_success == n_trial
+        lb = half_alpha ^ (1 / n_trial)
+        ub = 1
+    else
+        lb = quantile(Beta(n_success, n_trial - n_success + 1), half_alpha)
+        ub = quantile(Beta(n_success + 1, n_trial - n_success), 1 - half_alpha)
+    end
+    return lb, ub
+end

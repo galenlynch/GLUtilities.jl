@@ -1,7 +1,7 @@
 __precompile__()
 module GLUtilities
 
-using Compat, Formatting
+using Compat, Formatting, Distributions
 
 import Base: isless, print
 
@@ -118,7 +118,8 @@ export
 
     ## Random
     randperm_notsame,
-    mc_twotail_asymm_p
+    mc_twotail_asymm_p,
+    binomial_p_ci
 
 include("types.jl")
 include("times.jl")
