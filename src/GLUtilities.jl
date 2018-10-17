@@ -41,9 +41,7 @@ export
     time_range_to_sec,
     matlab_datevec_to_datetime,
     postgres_time_str,
-    postgres_datetime_micros,
     matlab_datestring,
-    postgres_tsrange_to_datetime_micros,
     iso_fine_datestring,
     micros,
 
