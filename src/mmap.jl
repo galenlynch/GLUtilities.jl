@@ -5,9 +5,12 @@ function typemmap(
     basedir::String = tempdir(),
     suffix::String = "",
     fpath::String = joinpath(basedir, basename(tempname()) * suffix),
-    autoclean::Bool = true
+    autoclean::Bool = true,
+    readonly::Bool = false
 ) where {A<:AbstractArray, N}
-    arr = Mmap.mmap(fpath, A, dims; grow = true)
+    arr = open(fpath, ifelse(readonly, "r+", "w+")) do io
+        Mmap.mmap(io, A, dims; grow = true)
+    end
     autoclean && atexit(()->rm(fpath))
     arr, fpath
 end
