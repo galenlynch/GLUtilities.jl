@@ -97,14 +97,17 @@ function join_intervals(
     intno = 0
     joined_start = ints[1][1]
     last_end = ints[1][2]
-    for int in ints
-        if int[2] - last_end > max_gap
+    for int in view(ints, 2:nint)
+        if int[1] - last_end > max_gap
+            # End last stretch
             intno += 1
             ints_merged[intno] = (joined_start, last_end)
             joined_start = int[1]
         end
         last_end = int[2]
     end
+    intno += 1
+    ints_merged[intno] = (joined_start, last_end)
     resize!(ints_merged, intno)
     ints_merged
 end
