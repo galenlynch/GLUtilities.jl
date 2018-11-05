@@ -86,30 +86,48 @@ function clip_int(input::NTuple{2, <:Number}, bounds::NTuple{2, <:Number})
     clip_int(input..., bounds...)
 end
 
-function join_intervals(
-    ints::AbstractVector{<:NTuple{2, T}}, max_gap::Number,
-) where T<:Number
+"""
+    join_intervals!(ints::Vector{NTuple{2, <:Number}}, max_gap)
+
+Join a list of sorted intervals, `ints`, if the gap between successive intervals
+is less than `max_gap`. Mutates input in-place
+
+Assumes ints are sorted by their first index.
+"""
+function join_intervals!(
+    ints::AbstractVector{<:NTuple{2, <:Number}}, max_gap::Number,
+)
     nint = length(ints)
     if nint == 0
-        return Vector{NTuple{2, T}}()
+        resize!(ints, 0)
+        return ints
     end
-    ints_merged = Vector{NTuple{2, T}}(undef, nint)
-    intno = 0
+    outno = 0
     joined_start = ints[1][1]
     last_end = ints[1][2]
-    for int in view(ints, 2:nint)
+    for intno in 2:nint
+        int = ints[intno]
         if int[1] - last_end > max_gap
             # End last stretch
-            intno += 1
-            ints_merged[intno] = (joined_start, last_end)
+            outno += 1
+            ints[outno] = (joined_start, last_end)
             joined_start = int[1]
         end
         last_end = int[2]
     end
-    intno += 1
-    ints_merged[intno] = (joined_start, last_end)
-    resize!(ints_merged, intno)
-    ints_merged
+    outno += 1
+    ints[outno] = (joined_start, last_end)
+    resize!(ints, outno)
+    ints
+end
+
+"""
+    join_intervals(ints::Vector{NTuple{2, <:Number}}, max_gap)
+
+See `join_intervals!`, but does not mutate input.
+"""
+function join_intervals(ints::AbstractVector{<:NTuple{2, <:Number}}, max_gap)
+    join_intervals!(copy(ints), max_gap)
 end
 
 function interval_complements(

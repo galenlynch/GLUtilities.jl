@@ -50,6 +50,7 @@ export
     interval_intersect,
     measure,
     clip_int,
+    join_intervals!,
     join_intervals,
     interval_complements,
     mask_events,
