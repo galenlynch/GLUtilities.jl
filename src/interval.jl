@@ -191,3 +191,25 @@ function interval_indices(
     i_e = searchsortedlast(basis, stop)
     i_b, i_e
 end
+
+function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
+    nx = length(xs)
+    out = Vector{NTuple{2, T}}(undef, nx)
+    nx == 0 && return out
+    @inbounds joined_start = xs[1]
+    last_x = joined_start
+    nout = 0
+    @inbounds for i in 2:nx
+        x = xs[i]
+        if x - last_x > min_gap
+            nout += 1
+            out[nout] = (joined_start, last_x)
+            joined_start = x
+        end
+        last_x = x
+    end
+    nout += 1
+    @inbounds out[nout] = (joined_start, last_x)
+    resize!(out, nout)
+    out
+end

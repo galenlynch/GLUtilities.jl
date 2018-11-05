@@ -57,6 +57,7 @@ export
     find_overlaps,
     interval_indices,
     is_subinterval,
+    throttle,
 
     ## Indices stuff
     clip_ndx,
