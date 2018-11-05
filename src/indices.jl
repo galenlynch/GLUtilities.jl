@@ -1,4 +1,8 @@
-"Converts an index to its time in a regularly sampled time series"
+"""
+    ndx_to_t(i, fs, start_t)
+
+Converts an index to its time in a regularly sampled time series.
+"""
 function ndx_to_t end
 function ndx_to_t(
     i::AbstractUnitRange, fs::R, start_t::R = zero(fs)
