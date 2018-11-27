@@ -94,6 +94,7 @@ export
     extrema_red,
     postgres_time_str,
     parse_postgres_array,
+    postgres_tsrange_to_datetime_micros,
 
     ## Array stuff
     weighted_mean,

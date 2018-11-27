@@ -64,6 +64,16 @@ function TSRange(rangestr::AbstractString)
     )
 end
 
+function postgres_tsrange_to_datetime_micros(timerange_str::AbstractString)
+    tr = TSRange(timerange_str)
+    (
+        DateTime(tr.lower.datetime),
+        micros(tr.lower.datetime),
+        DateTime(tr.upper.datetime),
+        micros(tr.upper.datetime)
+     )
+end
+
 function parse_postgres_array(s::AbstractString)
     m = match(POSTGRES_ARRAY_REG, s)
     m == nothing && return nothing
