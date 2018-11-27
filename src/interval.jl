@@ -213,3 +213,5 @@ function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
     resize!(out, nout)
     out
 end
+
+in(reg::NTuple{2, <:Number}, x::Number) = (x >= reg[1]) & (x <= reg[2])

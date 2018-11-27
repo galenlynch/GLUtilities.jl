@@ -3,7 +3,7 @@ module GLUtilities
 
 using Compat, Formatting, Distributions
 
-import Base: isless, print
+import Base: isless, print, in
 
 @static if VERSION >= v"0.7.0-DEV.2575"
     using
