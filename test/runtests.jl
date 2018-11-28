@@ -89,6 +89,19 @@ end
         @test interval_intersect(1, 4, 3, 5) == (3, 4)
     end
 
+    @testset "intervals" begin
+        ints_a = [(1, 2), (3, 4)]
+        @test intervals_diff(ints_a, [(1, 2)]) == [(3, 4)]
+        @test intervals_diff(ints_a, [(3, 5)]) == [(1, 2)]
+        @test intervals_diff(ints_a, NTuple{2, Int}[]) == ints_a
+        @test intervals_diff(ints_a, [(0, 1)]) == ints_a
+        @test intervals_diff(ints_a, [(4, 5)]) == ints_a
+        @test intervals_diff(ints_a, [(1.2, 1.7)]) ==
+            [(1.0, 1.2), (1.7, 2.0), (3.0, 4.0)]
+        @test intervals_diff(ints_a, [(1.2, 1.7), (3.2, 3.7)]) ==
+            [(1.0, 1.2), (1.7, 2.0), (3.0, 3.2), (3.7, 4.0)]
+    end
+
     @testset "array" begin
         A = rand(3, 3)
         B = rand(3)
