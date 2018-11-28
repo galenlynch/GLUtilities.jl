@@ -53,6 +53,7 @@ export
     join_intervals!,
     join_intervals,
     interval_complements,
+    intervals_diff,
     mask_events,
     find_overlaps,
     interval_indices,

@@ -227,3 +227,53 @@ function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
 end
 
 in(reg::NTuple{2, <:Number}, x::Number) = (x >= reg[1]) & (x <= reg[2])
+
+"""
+    intervals_diff(ints_a, ints_b) -> ints_out
+
+Find the 'set diff' of the intervals in `ints_a` and `ints_b`. Assumes both
+inputs are sorted.
+"""
+function intervals_diff(
+    ints_a::AbstractVector{<:NTuple{2, S}},
+    ints_b::AbstractVector{<:NTuple{2, T}}
+) where {S<:Number, T<:Number}
+    na = length(ints_a)
+    nb = length(ints_b)
+    nb == 0 && return copy(ints_a)
+    out_type = promote_type(S, T)
+    ints_out = Vector{NTuple{2, out_type}}(undef, na + nb + 1)
+    out_no = 0
+    b_no = 1
+    for a_no = 1:na
+        # Advance b_no until overlap with the current a interval is possible
+        while b_no <= nb && ints_b[b_no][2] <= ints_a[a_no][1]
+            b_no += 1
+        end
+        # Break if no intervals in b could overlap with a
+        if b_no > nb
+            n_a_rest = n_ndx(a_no, na)
+            ints_out[out_no + 1:out_no + n_a_rest] .= convert.(
+                NTuple{2, out_type}, view(ints_a, a_no:na)
+            )
+            out_no += n_a_rest
+            break
+        end
+        last_b = b_no - 1 # Allow for no overlap by using b_no - 1
+        # Find which b intervals overlap with this a interval
+        while last_b < nb && check_overlap(ints_a[a_no], ints_b[last_b + 1])
+            last_b += 1
+        end
+        # Find complement between this a interval and overlapping b intervals
+        complements = interval_complements(
+            ints_a[a_no][1], ints_a[a_no][2], view(ints_b, b_no:last_b)
+        )
+        nc = length(complements)
+        ints_out[out_no + 1:out_no + nc] = complements
+        out_no += nc
+        # Skip over used intervals in b
+        b_no = ifelse(last_b > b_no, last_b, b_no)
+    end
+    resize!(ints_out, out_no)
+    ints_out
+end
