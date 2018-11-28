@@ -1,5 +1,9 @@
 check_overlap(start1, stop1, start2, stop2) = (start1 <= stop2) & (start2 <= stop1)
 
+function check_overlap(tupa::NTuple{2, <:Number}, tupb::NTuple{2, <:Number})
+    check_overlap(tupa[1], tupa[2], tupb[1], tupb[2])
+end
+
 function is_subinterval(startchild, stopchild, startparent, stopparent)
     (startchild >= startparent) & (stopchild <= stopparent)
 end
@@ -124,7 +128,7 @@ end
 """
     join_intervals(ints::Vector{NTuple{2, <:Number}}, max_gap)
 
-See `join_intervals!`, but does not mutate input.
+Like [`join_intervals!`](@ref), but does not mutate input.
 """
 function join_intervals(ints::AbstractVector{<:NTuple{2, <:Number}}, max_gap)
     join_intervals!(copy(ints), max_gap)
@@ -184,6 +188,14 @@ function mask_events(event_times::AbstractVector{<:Number}, start, stop)
     view(event_times, i_b:i_e)
 end
 
+"""
+    interval_indices(
+        basis::Union{<:AbstractVector, AbstractRange}, start::Number, stop::Number
+    ) -> i_b, i_e
+
+Find the indices in `basis` that correspond to the interval specified by `start`
+ and `stop`.
+"""
 function interval_indices(
     basis::Union{<:AbstractVector, AbstractRange}, start::Number, stop::Number
 )

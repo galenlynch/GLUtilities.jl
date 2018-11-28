@@ -110,6 +110,11 @@ function clip_ndx end
 clip_ndx(ind::T, l::T) where T<:Integer = min(max(ind, one(T)), l)
 clip_ndx(ind::Integer, l::Integer) = clip_ndx(promote(ind, l)...)
 
+"""
+    n_ndx(start_idx::T, stop_idx::T) where {T<:Integer}
+
+Find the number of indices between `start_idx` and `stop_idx`.
+"""
 n_ndx(start_idx::T, stop_idx::T) where {T<:Integer} = stop_idx - start_idx + one(T)
 
 function expand_selection(ib::T, ie::T, imax::T, expansion::T) where T<:Integer
