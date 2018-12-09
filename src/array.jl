@@ -234,3 +234,23 @@ function simple_summary_stats(a::AbstractArray)
     sem = s / sqrt(length(a))
     m, s, sem
 end
+
+"""
+    find_closest(a, target, ...)
+
+Find the index of the element in `a` that minimizes the absolute difference from
+the target.
+"""
+function find_closest end
+
+find_closest(arr::AbstractVector, target) = argmin(abs.(arr .- target))
+
+function find_closest(arr::AbstractVector, target, eligible::AbstractVector)
+    elig_ndxs = findall(eligible)
+    rel_ndx = find_closest(arr[eligible], target)
+    elig_ndxs[rel_ndx]
+end
+
+function find_closest(f::Function, arr::AbstractVector, target, args...)
+    find_closest(map(f, arr), f(target), args...)
+end

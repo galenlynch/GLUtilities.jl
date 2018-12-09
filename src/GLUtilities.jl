@@ -104,6 +104,7 @@ export
     local_extrema,
     rev_view,
     pairwise_idxs,
+    find_closest,
     map_pairwise,
     pmap_pairwise,
     find_subseq,
