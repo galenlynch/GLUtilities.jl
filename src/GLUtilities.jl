@@ -78,6 +78,7 @@ export
     make_slice_idx,
     make_expand_idx,
     view_trailing_slice,
+    invert_perm,
 
     ## String stuff
     only_matches,

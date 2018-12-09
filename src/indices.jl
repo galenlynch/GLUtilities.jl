@@ -262,3 +262,11 @@ end
 function ndx_wrap(i::T, max_ndx::Integer) where T<:Integer
     mod(i - one(T), T(max_ndx)) + one(T)
 end
+
+function invert_perm(p)
+    ip = similar(p)
+    for i = 1:length(p)
+        ip[p[i]] = i
+    end
+    ip
+end
