@@ -8,6 +8,10 @@ function is_subinterval(startchild, stopchild, startparent, stopparent)
     (startchild >= startparent) & (stopchild <= stopparent)
 end
 
+function is_subinterval(tupa::NTuple{2, <:Number}, tupb::NTuple{2, <:Number})
+    is_subinterval(tupa[1], tupa[2], tupb[1], tupb[2])
+end
+
 function check_overlap(a::AbstractVector{<:NTuple{2, <:Any}})
     na = length(a)
     for i = 1:na, j = (i + 1):na
