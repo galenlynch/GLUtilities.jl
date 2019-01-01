@@ -213,6 +213,13 @@ function interval_indices(
     i_b, i_e
 end
 
+"""
+    throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number ->
+    Vector{NTuple{2, T}}
+
+Join points in `x` into ranges, if the difference between neighboring elements
+is at least `min_gap`. Assumes `x` is sorted.
+"""
 function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
     nx = length(xs)
     out = Vector{NTuple{2, T}}(undef, nx)
