@@ -3,7 +3,20 @@ module GLUtilities
 
 using Compat, Formatting, Distributions
 
-import Base: isless, print, in
+import Base:
+    isless,
+    print,
+    in,
+    eltype,
+    mapreduce,
+    _mapreduce,
+    mapreduce_empty,
+    mapreduce_first,
+    pairwise_blocksize,
+    iterate,
+    IteratorSize,
+    IteratorEltype,
+    SizeUnknown
 
 @static if VERSION >= v"0.7.0-DEV.2575"
     using
@@ -117,6 +130,7 @@ export
     find_subseq,
     subselect,
     simple_summary_stats,
+    skipnothing,
 
     ## Mmap stuff
     typemmap,
