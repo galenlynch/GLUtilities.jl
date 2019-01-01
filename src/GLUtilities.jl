@@ -91,6 +91,7 @@ export
     dir_find_files,
 
     ## equality checking
+    absdiff,
     allsame,
     anyeq,
 
