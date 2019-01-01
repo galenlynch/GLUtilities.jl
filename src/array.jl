@@ -270,3 +270,38 @@ end
 function find_closest(f::Function, arr::AbstractVector, target, args...)
     find_closest(map(f, arr), f(target), args...)
 end
+
+function quantiles_mmap(v, p; kwargs...)
+    v_mmap, f = to_mmap(v)
+    q = try
+        q = quantiles!(v_mmap, p; kwargs...)
+    finally
+        rm(f)
+    end
+    q
+end
+
+function mad_quantiles!(out::AbstractVector{T}, a::AbstractVector) where T <: AbstractFloat
+    # Allocation
+    na = length(a)
+    length(out) == na || throw(ArgumentError("a and out not the same length"))
+    p, f = typemmap(Vector{Int32}, (na,), autoclean = false)
+    try
+        # MAD
+        ma = convert(T, median(a))
+        out .= abs.(a .- ma)
+
+        # Rank MAD
+        sortperm!(p, out)
+
+        # Make quantile
+        @inbounds for i = 1:na
+            out[p[i]] = i / na
+        end
+    finally
+        rm(f)
+    end
+    out
+end
+
+mad_quantiles(a) = mad_quantiles!(similar(a, Float32), a)

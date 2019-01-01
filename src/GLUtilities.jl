@@ -106,6 +106,8 @@ export
     weighted_mean,
     weighted_mean_dim,
     local_extrema,
+    mad_quantiles,
+    mad_quantiles!,
     rev_view,
     pairwise_idx,
     pairwise_idxs,
