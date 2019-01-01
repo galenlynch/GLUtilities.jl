@@ -49,6 +49,7 @@ export
     check_overlap,
     interval_intersect,
     measure,
+    clip,
     clip_int,
     join_intervals!,
     join_intervals,

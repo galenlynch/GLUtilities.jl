@@ -85,10 +85,12 @@ function extrema_red(a::A) where {T<:NTuple{2, Number}, A<:AbstractVector{T}}
     return (cmin, cmax)
 end
 
+clip(x, b, e) = min(max(x, b), e)
+
 function clip_int(
     int_begin::Number, int_end::Number, bound_begin::Number, bound_end::Number
 )
-    (max(int_begin, bound_begin), min(int_end, bound_end))
+    (clip(int_begin, bound_begin, bound_end), clip(int_end, bound_begin, bound_end))
 end
 function clip_int(input::NTuple{2, <:Number}, bounds::NTuple{2, <:Number})
     clip_int(input..., bounds...)
