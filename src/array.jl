@@ -132,6 +132,22 @@ function pairwise_idxs(n::Integer)
     idxs
 end
 
+"n is the number of elements in the INPUT of pairwise diff"
+_pairwise_idx(i, j, n) = i - j + div((j - 1) * (2 * (n - 1) - (j - 2)), 2)
+
+"""
+n_el is the number of elements in the INPUT to pairwise diff
+"""
+function pairwise_idx(i, j, n)
+    if i == j
+        error("invalid indices")
+    elseif i < j
+        return _pairwise_idx(j, i, n)
+    else
+        return _pairwise_idx(i, j, n)
+    end
+end
+
 function map_pairwise(
     f::Function, a::AbstractVector{T}, ::Type{R} = T
 ) where {T, R}

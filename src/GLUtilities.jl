@@ -107,6 +107,7 @@ export
     weighted_mean_dim,
     local_extrema,
     rev_view,
+    pairwise_idx,
     pairwise_idxs,
     find_closest,
     map_pairwise,
