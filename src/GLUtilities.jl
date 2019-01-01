@@ -51,6 +51,8 @@ export
     measure,
     clip,
     clip_int,
+    expand_intervals!,
+    expand_intervals,
     join_intervals!,
     join_intervals,
     interval_complements,

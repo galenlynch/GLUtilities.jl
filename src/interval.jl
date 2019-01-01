@@ -100,12 +100,14 @@ end
     join_intervals!(ints::Vector{NTuple{2, <:Number}}, max_gap)
 
 Join a list of sorted intervals, `ints`, if the gap between successive intervals
-is less than `max_gap`. Mutates input in-place
+is less than `min_gap`. Mutates input in-place
 
 Assumes ints are sorted by their first index.
 """
+function join_intervals! end
+
 function join_intervals!(
-    ints::AbstractVector{<:NTuple{2, <:Number}}, max_gap::Number,
+    f::Function, ints::AbstractVector{<:NTuple{2, <:Number}}, min_gap::Number,
 )
     nint = length(ints)
     if nint == 0
@@ -117,27 +119,28 @@ function join_intervals!(
     last_end = ints[1][2]
     for intno in 2:nint
         int = ints[intno]
-        if int[1] - last_end > max_gap
+        if int[1] - last_end > min_gap
             # End last stretch
             outno += 1
-            ints[outno] = (joined_start, last_end)
+            ints[outno] = f((joined_start, last_end))
             joined_start = int[1]
         end
         last_end = int[2]
     end
     outno += 1
-    ints[outno] = (joined_start, last_end)
+    ints[outno] = f((joined_start, last_end))
     resize!(ints, outno)
     ints
 end
+join_intervals!(ints::AbstractVector, min_gap) = join_intervals!(identity, ints, min_gap)
 
 """
-    join_intervals(ints::Vector{NTuple{2, <:Number}}, max_gap)
+    join_intervals(ints::Vector{NTuple{2, <:Number}}, min_gap)
 
 Like [`join_intervals!`](@ref), but does not mutate input.
 """
-function join_intervals(ints::AbstractVector{<:NTuple{2, <:Number}}, max_gap)
-    join_intervals!(copy(ints), max_gap)
+function join_intervals(ints::AbstractVector{<:NTuple{2, <:Number}}, min_gap)
+    join_intervals!(copy(ints), min_gap)
 end
 
 function interval_complements(
@@ -283,3 +286,13 @@ function intervals_diff(
     resize!(ints_out, out_no)
     ints_out
 end
+
+function expand_intervals!(
+    ints_in::AbstractVector{<:NTuple{2, <:Number}}, expand::Number
+)
+    half_exp = expand / 2
+    f = ((b, e),) -> (b - half_exp, e + half_exp)
+    join_intervals!(f, ints_in, expand)
+    ints_in
+end
+expand_intervals(ints_in, expand) = expand_intervals!(copy(ints_in), expand)
