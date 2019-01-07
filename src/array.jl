@@ -327,20 +327,22 @@ julia> collect(skipnothing([1 nothing; 2 nothing]))
  2
 ```
 """
-skipnothing(itr) = SkipNothing(itr)
+skipoftype(::Type{T}, itr::A) where {T, A} = SkipOfType{T, A}(itr)
+skipoftype(::T, itr) where T = skipoftype(T, itr)
 
-struct SkipNothing{T}
-    x::T
+struct SkipOfType{T, A}
+    x::A
 end
-IteratorSize(::Type{<:SkipNothing}) = SizeUnknown()
-IteratorEltype(::Type{SkipNothing{T}}) where {T} = IteratorEltype(T)
-eltype(::Type{SkipNothing{T}}) where {T} = nonnothingtype(eltype(T))
 
-function iterate(itr::SkipNothing, state...)
+IteratorSize(::Type{<:SkipOfType}) = SizeUnknown()
+IteratorEltype(::Type{SkipOfType{T, A}}) where {T, A} = IteratorEltype(A)
+eltype(::Type{SkipOfType{T, A}}) where {T, A} = union_poptype(T, eltype(A))
+
+function iterate(itr::SkipOfType{T, <:Any}, state...) where T
     y = iterate(itr.x, state...)
     y === nothing && return nothing
     item, state = y
-    while item === nothing
+    while item isa T
         y = iterate(itr.x, state)
         y === nothing && return nothing
         item, state = y
@@ -351,10 +353,13 @@ end
 # Optimized mapreduce implementation
 # The generic method is faster when !(eltype(A) >: Nothing) since it does not need
 # additional loops to identify the two first non-nothing values of each block
-mapreduce(f, op, itr::SkipNothing{<:AbstractArray}) =
-    _mapreduce(f, op, IndexStyle(itr.x), eltype(itr.x) >: Nothing ? itr : itr.x)
+function mapreduce(f, op, itr::SkipOfType{T, <:AbstractArray}) where T
+    _mapreduce(f, op, IndexStyle(itr.x), eltype(itr.x) >: T ? itr : itr.x)
+end
 
-function _mapreduce(f, op, ::IndexLinear, itr::SkipNothing{<:AbstractArray})
+function _mapreduce(
+    f, op, ::IndexLinear, itr::SkipOfType{T, <:AbstractArray}
+) where T
     A = itr.x
     local ai
     inds = LinearIndices(A)
@@ -362,7 +367,7 @@ function _mapreduce(f, op, ::IndexLinear, itr::SkipNothing{<:AbstractArray})
     ilast = last(inds)
     while i <= ilast
         @inbounds ai = A[i]
-        ai === nothing || break
+        ai isa T  || break
         i += 1
     end
     i > ilast && return mapreduce_empty(f, op, eltype(itr))
@@ -370,29 +375,31 @@ function _mapreduce(f, op, ::IndexLinear, itr::SkipNothing{<:AbstractArray})
     i += 1
     while i <= ilast
         @inbounds ai = A[i]
-        ai === nothing || break
+        ai isa T || break
         i += 1
     end
     i > ilast && return mapreduce_first(f, op, a1)
     # We know A contains at least two non-nothing entries: the result cannot be nothing
-    mapreduce_impl(f, op, itr, first(inds), last(inds))
+    something(mapreduce_impl(f, op, itr, first(inds), last(inds)))
 end
 
-_mapreduce(f, op, ::IndexCartesian, itr::SkipNothing) = mapfoldl(f, op, itr)
+_mapreduce(f, op, ::IndexCartesian, itr::SkipOfType) = mapfoldl(f, op, itr)
 
-mapreduce_impl(f, op, A::SkipNothing, ifirst::Integer, ilast::Integer) =
+mapreduce_impl(f, op, A::SkipOfType, ifirst::Integer, ilast::Integer) =
     mapreduce_impl(f, op, A, ifirst, ilast, pairwise_blocksize(f, op))
 
 # Returns nothing when the input contains only nothing values
-@noinline function mapreduce_impl(f, op, itr::SkipNothing{<:AbstractArray},
-                                  ifirst::Integer, ilast::Integer, blksize::Int)
+@noinline function mapreduce_impl(
+    f, op, itr::SkipOfType{T, <:AbstractArray}, ifirst::Integer, ilast::Integer,
+    blksize::Int
+) where T
     A = itr.x
     if ifirst == ilast
         @inbounds a1 = A[ifirst]
-        if a1 === nothing
+        if a1 isa T
             return nothing
         else
-            return mapreduce_first(f, op, a1)
+            return Some(mapreduce_first(f, op, a1))
         end
     elseif ifirst + blksize > ilast
         # sequential portion
@@ -400,7 +407,7 @@ mapreduce_impl(f, op, A::SkipNothing, ifirst::Integer, ilast::Integer) =
         i = ifirst
         while i <= ilast
             @inbounds ai = A[i]
-            ai === nothing || break
+            ai isa T || break
             i += 1
         end
         i > ilast && return nothing
@@ -408,20 +415,20 @@ mapreduce_impl(f, op, A::SkipNothing, ifirst::Integer, ilast::Integer) =
         i += 1
         while i <= ilast
             @inbounds ai = A[i]
-            ai === nothing || break
+            ai isa T || break
             i += 1
         end
-        i > ilast && return mapreduce_first(f, op, a1)
+        i > ilast && return Some(mapreduce_first(f, op, a1))
         a2 = ai::eltype(itr)
         i += 1
         v = op(f(a1), f(a2))
         @simd for i = i:ilast
             @inbounds ai = A[i]
-            if ai !== nothing
+            if !(ai isa T)
                 v = op(v, f(ai))
             end
         end
-        return v
+        return Some(v)
     else
         # pairwise portion
         imid = (ifirst + ilast) >> 1
@@ -434,12 +441,13 @@ mapreduce_impl(f, op, A::SkipNothing, ifirst::Integer, ilast::Integer) =
         elseif v2 === nothing
             return v1
         else
-            return op(v1, v2)
+            return Some(op(something(v1), something(v2)))
         end
     end
 end
 
-nonnothingtype(::Type{Union{T, Nothing}}) where {T} = T
-nonnothingtype(::Type{Nothing}) = Union{}
-nonnothingtype(::Type{T}) where {T} = T
-nonnothingtype(::Type{Any}) = Any
+union_poptype(::Type{T}, ::Type{Union{T,S}}) where {T, S} = S
+union_poptype(::Type{T}, ::Type{S}) where {T, S} = S
+union_poptype(::Type{T}, ::Type{T}) where {T} = Union{}
+
+skipnothing(itr) = skipoftype(Nothing, itr)
