@@ -16,7 +16,8 @@ import Base:
     iterate,
     IteratorSize,
     IteratorEltype,
-    SizeUnknown
+    SizeUnknown,
+    -
 
 @static if VERSION >= v"0.7.0-DEV.2575"
     using

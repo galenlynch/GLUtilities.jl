@@ -9,6 +9,10 @@ function PreciseDateTime(dt::DateTime, micros::Real)
     add_seconds(PreciseDateTime(dt), micros / 10^6)
 end
 
+function -(x::PreciseDateTime, y::PreciseDateTime)
+    Second(x.date - y.date).value + (x.time - y.time).value * 1e-9
+end
+
 DateTime(pdt::PreciseDateTime) = DateTime(pdt.date) + pdt.time.instant
 
 micros(pdt::PreciseDateTime) = Dates.microsecond(pdt.time)
@@ -75,3 +79,11 @@ function print(io::IO, r::TSRange)
     print(ioc, r.upper.datetime)
     print(io, rb)
 end
+
+function check_overlap(a::TSRange, b::TSRange)
+    check_overlap(
+        a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime
+    )
+end
+
+duration(a::TSRange) = a.upper.datetime - a.lower.datetime
