@@ -47,6 +47,7 @@ export
     div_type,
 
     ## Time stuff
+    FILE_DATEFORMAT,
     PreciseDateTime,
     RangeBound,
     TSRange,

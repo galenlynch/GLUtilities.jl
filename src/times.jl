@@ -1,3 +1,5 @@
+const FILE_DATEFORMAT = DateFormat("yyyy-mm-ddTHH-MM-SS")
+
 struct PreciseDateTime
     date::Date
     time::Time
