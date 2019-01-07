@@ -71,8 +71,8 @@ end
 
 function print(io::IO, r::TSRange)
     ioc = IOContext(io, :postgres => true)
-    lb = r.lower.inclusive ? '[' : '('
-    rb = r.upper.inclusive ? ']' : ')'
+    lb = ifelse(r.lower.inclusive, '[', '(')
+    rb = ifelse(r.upper.inclusive, ']', ')')
     print(io, lb)
     print(ioc, r.lower.datetime)
     print(io, ',')
