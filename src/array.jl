@@ -457,7 +457,10 @@ function _moving_sum!(out, s, nav, nout)
     if nav <= 1
         copyto!(out, 1, s, 1, nout)
     elseif nout > 0
-        out[1] = sum(view(s, 1:nav))
+        @inbounds out[1] = 0
+        @inbounds @simd for i = 1:nav
+            out[1] += s[i]
+        end
         @inbounds for i = 2:nout
             # The only thing that changes is the first and last part of the window
             out[i] = out[i - 1] + s[i + nav - 1] - s[i - 1]
