@@ -133,6 +133,8 @@ export
     subselect,
     simple_summary_stats,
     skipnothing,
+    moving_sum!,
+    moving_sum,
 
     ## Mmap stuff
     typemmap,

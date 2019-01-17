@@ -451,3 +451,46 @@ union_poptype(::Type{T}, ::Type{S}) where {T, S} = S
 union_poptype(::Type{T}, ::Type{T}) where {T} = Union{}
 
 skipnothing(itr) = skipoftype(Nothing, itr)
+
+# Does not check input lengths
+function _moving_sum!(out, s, nav, nout)
+    if nav <= 1
+        copyto!(out, 1, s, 1, nout)
+    elseif nout > 0
+        out[1] = sum(view(s, 1:nav))
+        @inbounds for i = 2:nout
+            # The only thing that changes is the first and last part of the window
+            out[i] = out[i - 1] + s[i + nav - 1] - s[i - 1]
+        end
+    end
+    out
+end
+
+"""
+    moving_sum!(out, s, nav)
+
+Sum `s` in a sliding window of `nav` points, placing the result into `out`.
+The length of `out` should be `max(length(s) - nav + 1, 0)` if `nav > 0`, or
+`length(s)` otherwise.
+
+Does not zero-pad.
+"""
+function moving_sum!(out, s, nav)
+    nin = length(s)
+    nout = length(out)
+    if nout != ifelse(nav == 0, nin, max(nin - nav + 1, 0))
+        throw(ArgumentError("out is not the right size"))
+    end
+    _moving_sum!(out, s, nav, nout)
+end
+
+"""
+    moving_sum(s, nav)
+
+Same as [`moving_sum!`](@ref), but returns a new array.
+"""
+function moving_sum(s::AbstractVector, nav::Integer)
+    nin = length(s)
+    nout = ifelse(nav == 0, nin, max(nin - nav + 1, 0))
+    _moving_sum!(similar(s, nout), s, nav, nout)
+end
