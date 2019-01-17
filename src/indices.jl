@@ -138,7 +138,7 @@ If npt is negative, then start_ndx is treated like the end of a range of element
 and the index required to return npt number of elements is returned.
 """
 function ndx_offset(start_ndx::T, npt::T) where {T<:Integer}
-    adjust = npt < zero(T) ? one(T) : -one(T)
+    adjust = ifelse(npt < zero(T), one(T), -one(T))
     return start_ndx + npt + adjust;
 end
 
