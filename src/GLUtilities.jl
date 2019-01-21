@@ -41,6 +41,7 @@ end
 export
     # Constants
     POSTGRES_DATE_FORMAT,
+    PSQL_DATETIME_REG,
     MICRO_FORMAT,
 
     # Functions

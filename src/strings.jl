@@ -1,10 +1,14 @@
 function only_matches(reg::Regex, strs::A) where {T<:AbstractString, A<:AbstractArray{T}}
-    matches = Vector{RegexMatch}()
+    n_s = length(strs)
+    matches = Vector{RegexMatch}(undef, n_s)
+    out_no = 0
     for str in strs
         maybe_match = match(reg, str)
         if maybe_match != nothing
-            push!(matches, maybe_match)
+            out_no += 1
+            matches[out_no] = maybe_match
         end
     end
-    return matches
+    resize!(matches, out_no)
+    matches
 end
