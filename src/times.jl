@@ -1,4 +1,5 @@
 const FILE_DATEFORMAT = DateFormat("yyyy-mm-ddTHH-MM-SS")
+const JULIA_DT_REG = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
 
 struct PreciseDateTime
     date::Date
