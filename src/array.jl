@@ -483,10 +483,10 @@ Does not zero-pad.
 function moving_sum!(out, s, nav)
     nin = length(s)
     nout = length(out)
-    if nout != ifelse(nav == 0, nin, max(nin - nav + 1, 0))
+    if nout != ifelse(nav == 0, nin, max(nin - nav + 1, min(nin, 1)))
         throw(ArgumentError("out is not the right size"))
     end
-    _moving_sum!(out, s, nav, nout)
+    _moving_sum!(out, s, min(nav, nin), nout)
 end
 
 """
@@ -496,6 +496,6 @@ Same as [`moving_sum!`](@ref), but returns a new array.
 """
 function moving_sum(s::AbstractVector, nav::Integer)
     nin = length(s)
-    nout = ifelse(nav == 0, nin, max(nin - nav + 1, 0))
-    _moving_sum!(similar(s, nout), s, nav, nout)
+    nout = ifelse(nav == 0, nin, max(nin - nav + 1, min(nin, 1)))
+    _moving_sum!(similar(s, nout), s, min(nav, nin), nout)
 end
