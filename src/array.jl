@@ -499,3 +499,17 @@ function moving_sum(s::AbstractVector, nav::Integer)
     nout = ifelse(nav == 0, nin, max(nin - nav + 1, min(nin, 1)))
     _moving_sum!(similar(s, nout), s, min(nav, nin), nout)
 end
+
+"""
+    trailing_zeros_idx(arr)
+
+return last index that is not zero
+"""
+function trailing_zeros_idx(arr)
+    l = length(arr)
+    last_idx = l
+    while last_idx > 0 && arr[last_idx] == 0
+        last_idx -= 1
+    end
+    last_idx
+end

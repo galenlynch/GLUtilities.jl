@@ -137,6 +137,7 @@ export
     skipnothing,
     moving_sum!,
     moving_sum,
+    trailing_zeros_idx,
 
     ## Mmap stuff
     typemmap,
