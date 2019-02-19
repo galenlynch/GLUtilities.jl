@@ -138,6 +138,7 @@ export
     moving_sum!,
     moving_sum,
     trailing_zeros_idx,
+    thresh_cross,
 
     ## Mmap stuff
     typemmap,

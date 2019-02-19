@@ -513,3 +513,21 @@ function trailing_zeros_idx(arr)
     end
     last_idx
 end
+
+function thresh_cross(
+    arr,
+    thresh,
+    comp = <
+)
+    l = length(arr)
+    idx_cross = Vector{Int}(undef, div(l, 2))
+    out_no = 0
+    for i in 1:l - 1
+        if comp(arr[i], thresh) & (! comp(arr[i + 1], thresh))
+            out_no += 1
+            idx_cross[out_no] = i + 1
+        end
+    end
+    resize!(idx_cross, out_no)
+    idx_cross
+end
