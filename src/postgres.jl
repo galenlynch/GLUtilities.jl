@@ -39,6 +39,15 @@ function postgres_make_tsrange_str(
     )
 end
 
+function postgres_make_tsrange_str(tsr::TSRange)
+    postgres_make_tsrange_str(
+        dt_and_micros(tsr.lower.datetime)...,
+        dt_and_micros(tsr.upper.datetime)...;
+        start_bracket = ifelse(tsr.lower.inclusive, '[', '('),
+        stop_bracket = ifelse(tsr.upper.inclusive, ']', ')')
+    )
+end
+
 function TSRange(rangestr::AbstractString)
     m = match(PSQL_RANGE_REG, rangestr)
     m == nothing && error("Could not parse ", s, " as TSRange")
