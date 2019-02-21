@@ -18,6 +18,8 @@ DateTime(pdt::PreciseDateTime) = DateTime(pdt.date) + pdt.time.instant
 
 micros(pdt::PreciseDateTime) = Dates.microsecond(pdt.time)
 
+dt_and_micros(pdt::PreciseDateTime) = (DateTime(pdt), micros(pdt))
+
 function isless(a::PreciseDateTime, b::PreciseDateTime)
     a.date < b.date || (a.date == b.date && a.time < b.time)
 end

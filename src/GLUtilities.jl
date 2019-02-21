@@ -61,6 +61,7 @@ export
     matlab_datestring,
     iso_fine_datestring,
     micros,
+    dt_and_micros,
 
     ## Interval stuff
     check_overlap,
