@@ -531,3 +531,5 @@ function thresh_cross(
     resize!(idx_cross, out_no)
     idx_cross
 end
+
+centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2

@@ -141,6 +141,7 @@ export
     moving_sum,
     trailing_zeros_idx,
     thresh_cross,
+    centered_basis,
 
     ## Mmap stuff
     typemmap,
