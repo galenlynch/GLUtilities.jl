@@ -539,9 +539,20 @@ end
 
 centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2
 
-function _glhist!(cnts, xs, first, nbin, step)
-    for x in xs
-        binndx = convert(Int, fld(x - first, step)) + 1
+function _glhist!(cnts, xs, first, nbin::Integer, step)
+    m = 1 / step
+    @inbounds for x in xs
+        binndx = floor(Int, m * (x - first)) + 1
+        inbounds = (binndx > 0) & (binndx <= nbin)
+        trunc_ndx = ifelse(inbounds, binndx, 1)
+        cnts[trunc_ndx] += inbounds
+    end
+    cnts
+end
+
+function _glhist!(cnts, xs, first::Integer, nbin::Integer, step::Integer)
+    @inbounds for x in xs
+        binndx = fld(x - first, step) + 1
         inbounds = (binndx > 0) & (binndx <= nbin)
         trunc_ndx = ifelse(inbounds, binndx, 1)
         cnts[trunc_ndx] += inbounds
