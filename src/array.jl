@@ -540,6 +540,7 @@ end
 centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2
 
 function _glhist!(cnts, xs, first, nbin::Integer, step)
+    # Approximating division with multiplication of inverse is 20x faster
     m = 1 / step
     @inbounds for x in xs
         binndx = floor(Int, m * (x - first)) + 1
