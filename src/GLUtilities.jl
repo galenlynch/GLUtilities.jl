@@ -3,6 +3,8 @@ module GLUtilities
 
 using Compat, Formatting, Distributions
 
+using IterTools: imap
+
 import Base:
     isless,
     print,
@@ -142,6 +144,9 @@ export
     trailing_zeros_idx,
     thresh_cross,
     centered_basis,
+    imap_product,
+    glhist!,
+    glhist,
 
     ## Mmap stuff
     typemmap,

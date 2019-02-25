@@ -177,6 +177,11 @@ function map_pairwise(
     out
 end
 
+imap_product(f, as, bs) = imap(
+    x -> @inbounds(f(x[1], x[2])),
+    Iterators.product(as, bs)
+)
+
 function pmap_pairwise(f::Function, as::AbstractVector)
     pairs = pairwise_idxs(length(as))
     pmap(((x, y),) -> f(as[x], as[y]), pairs)
@@ -533,3 +538,28 @@ function thresh_cross(
 end
 
 centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2
+
+function _glhist!(cnts, xs, first, nbin, step)
+    for x in xs
+        binndx = convert(Int, fld(x - first, step)) + 1
+        inbounds = (binndx > 0) & (binndx <= nbin)
+        trunc_ndx = ifelse(inbounds, binndx, 1)
+        cnts[trunc_ndx] += inbounds
+    end
+    cnts
+end
+
+_glhist!(cnts, xs, r::StepRangeLen) =
+    _glhist!(cnts, xs, r[1], length(r) - 1, Float64(r.step))
+_glhist!(cnts, xs, r::UnitRange) = _glhist!(cnts, xs, r[1], length(r) - 1, 1)
+_glhist!(cnts, xs, r::AbstractVector) =
+    _glhist!(cnts, xs, r[1], length(r) - 1, r[2] - r[1])
+
+"Histogram, left inclusive. Assumes regular bin size"
+function glhist!(cnts, xs, r)
+    length(cnts) == length(r) - 1 || error("cnts must be length length(r) - 1")
+    _glhist!(cnts, xs, r)
+end
+
+"Like glhist!"
+glhist(xs, r) = _glhist!(zeros(Int, length(r) - 1), xs, r)
