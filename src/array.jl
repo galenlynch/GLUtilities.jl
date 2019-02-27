@@ -575,3 +575,27 @@ end
 
 "Like glhist!"
 glhist(xs, r) = _glhist!(zeros(Int, length(r) - 1), xs, r)
+
+function find_local_extrema(
+    sig::AbstractVector,
+    start_ndx::Integer = div(length(sig), 2);
+    findmax::Bool = true,
+    right_on_ties::Bool = true
+)
+    sigl = length(sig)
+    sigl < 2 && return start_ndx
+    checkbounds(sig, start_ndx)
+    comp = ifelse(findmax, >=, <=)
+    bias = ifelse(right_on_ties, 1, -1)
+
+    search_ndx = start_ndx
+    @inbounds while true
+        notleft = search_ndx == 1 || comp(sig[search_ndx], sig[search_ndx - 1])
+        notright = search_ndx == sigl || comp(sig[search_ndx], sig[search_ndx + 1])
+        if notleft & notright
+            return search_ndx
+        else
+            search_ndx += ifelse(notleft, 1, ifelse(notright, -1, bias))
+        end
+    end
+end

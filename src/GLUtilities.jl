@@ -147,6 +147,7 @@ export
     imap_product,
     glhist!,
     glhist,
+    find_local_extrema,
 
     ## Mmap stuff
     typemmap,
