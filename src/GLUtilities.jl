@@ -69,6 +69,7 @@ export
     check_overlap,
     interval_intersect,
     measure,
+    midpoint,
     clip,
     clip_int,
     expand_intervals!,

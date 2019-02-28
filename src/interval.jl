@@ -51,6 +51,8 @@ end
 
 measure(a::NTuple{2, <:Number}) = a[2] - a[1]
 
+midpoint(a::NTuple{2, <:Number}) = (a[1] + a[2]) / 2
+
 function reduce_extrema(s1::T, s2::T, t1::T, t2::T) where T<:Number
     return (min(s1, t1), max(s2, t2))
 end
