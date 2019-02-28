@@ -148,6 +148,7 @@ export
     glhist!,
     glhist,
     find_local_extrema,
+    stepsize,
 
     ## Mmap stuff
     typemmap,

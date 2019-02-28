@@ -539,6 +539,10 @@ end
 
 centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2
 
+stepsize(r::StepRangeLen) = Float64(r.step)
+stepsize(::UnitRange) = 1
+stepsize(a::AbstractVector) = a[2] - a[1]
+
 function _glhist!(cnts, xs, first, nbin::Integer, step)
     # Approximating division with multiplication of inverse is 20x faster
     m = 1 / step
@@ -551,30 +555,25 @@ function _glhist!(cnts, xs, first, nbin::Integer, step)
     cnts
 end
 
-function _glhist!(cnts, xs, first::Integer, nbin::Integer, step::Integer)
-    @inbounds for x in xs
-        binndx = fld(x - first, step) + 1
-        inbounds = (binndx > 0) & (binndx <= nbin)
-        trunc_ndx = ifelse(inbounds, binndx, 1)
-        cnts[trunc_ndx] += inbounds
-    end
-    cnts
-end
+_glhist!(cnts, xs, r) = _glhist!(cnts, xs, first(r), length(r) - 1, stepsize(r))
 
-_glhist!(cnts, xs, r::StepRangeLen) =
-    _glhist!(cnts, xs, r[1], length(r) - 1, Float64(r.step))
-_glhist!(cnts, xs, r::UnitRange) = _glhist!(cnts, xs, r[1], length(r) - 1, 1)
-_glhist!(cnts, xs, r::AbstractVector) =
-    _glhist!(cnts, xs, r[1], length(r) - 1, r[2] - r[1])
+"""
+    glhist!(cnts, xs, r)
 
-"Histogram, left inclusive. Assumes regular bin size"
+Histogram, left inclusive. Assumes regular bin size.
+"""
 function glhist!(cnts, xs, r)
     length(cnts) == length(r) - 1 || error("cnts must be length length(r) - 1")
     _glhist!(cnts, xs, r)
 end
 
-"Like glhist!"
-glhist(xs, r) = _glhist!(zeros(Int, length(r) - 1), xs, r)
+"""
+    glhist([::Type{T} = Int,] xs, r) where T
+
+Like [`glhist!`](@ref).
+"""
+glhist(::Type{T}, xs, r) where T = _glhist!(zeros(T, length(r) - 1), xs, r)
+glhist(xs, r) = glhist(Int, xs, r)
 
 function find_local_extrema(
     sig::AbstractVector,
