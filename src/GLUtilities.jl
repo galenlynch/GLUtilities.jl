@@ -150,6 +150,8 @@ export
     glhist,
     find_local_extrema,
     stepsize,
+    filter_no_collisions,
+    window_counts,
 
     ## Mmap stuff
     typemmap,

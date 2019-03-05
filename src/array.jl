@@ -602,3 +602,62 @@ function find_local_extrema(
         end
     end
 end
+
+"""
+    filter_no_collisions(as, bs, coll_rad)
+
+Filter elements of `as` to keep elements that are not within `coll_rad` of any
+element in `bs`. Assumes both are sorted.
+"""
+function filter_no_collisions(as, bs, coll_rad)
+    out = similar(as)
+    outno = 0
+    nb = length(bs)
+    na = length(as)
+    ib = 1
+    for (i, a) in enumerate(as)
+        # Skip over bs that are too far back to matter
+        while ib <= nb && a - bs[ib] > coll_rad
+            ib += 1
+        end
+        if ib > nb
+            # No times to avoid, push the rest of as into out
+            nremainder = na - i + 1
+            copyto!(out, outno + 1, as, i, nremainder)
+            outno += nremainder
+            break
+        end
+        # Only keep elements of as that do not collide with bs
+        # If the next element of bs does not collide, none of the others will
+        if abs(a - bs[ib]) > coll_rad
+            outno += 1
+            out[outno] = a
+        end
+    end
+    resize!(out, outno)
+    out
+end
+
+"""
+    window_counts(ts, window_dur)
+
+For each event in `ts`, count the number of events in `ts` that are in the
+range of `ts[i]` and `ts[i] + window_dur`. Assumes `ts` is sorted, and
+that elements of `ts` are unique.
+"""
+function window_counts(ts, window_dur)
+    cnts = similar(ts, Int)
+    for (i, t) in enumerate(ts)
+        se = searchsortedlast(ts, t + window_dur)
+        cnts[i] = se - i + 1
+    end
+    cnts
+end
+
+function window_counts(ts, window_dur, tb, te)
+    ib = searchsortedfirst(ts, tb)
+    ie = searchsortedlast(ts, te)
+    subset = view(ts, ib:ie)
+    cnts = window_counts(subset, window_dur)
+    cnts, ib
+end
