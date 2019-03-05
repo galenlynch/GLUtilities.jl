@@ -543,14 +543,18 @@ stepsize(r::StepRangeLen) = Float64(r.step)
 stepsize(::UnitRange) = 1
 stepsize(a::AbstractVector) = a[2] - a[1]
 
+@inline @inbounds function _glhist_push!(cnts, x, first, nbin, m)
+    binndx = floor(Int, m * (x - first)) + 1
+    inbounds = (binndx > 0) & (binndx <= nbin)
+    trunc_ndx = ifelse(inbounds, binndx, 1)
+    cnts[trunc_ndx] += inbounds
+end
+
 function _glhist!(cnts, xs, first, nbin::Integer, step)
     # Approximating division with multiplication of inverse is 20x faster
     m = 1 / step
-    @inbounds for x in xs
-        binndx = floor(Int, m * (x - first)) + 1
-        inbounds = (binndx > 0) & (binndx <= nbin)
-        trunc_ndx = ifelse(inbounds, binndx, 1)
-        cnts[trunc_ndx] += inbounds
+    for x in xs
+        _glhist_push!(cnts, x, first, nbin, m)
     end
     cnts
 end
