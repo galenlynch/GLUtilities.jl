@@ -68,6 +68,7 @@ export
     ## Interval stuff
     check_overlap,
     interval_intersect,
+    interval_intersections,
     measure,
     midpoint,
     clip,

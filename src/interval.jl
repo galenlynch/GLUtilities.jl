@@ -49,6 +49,31 @@ function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
     res
 end
 
+"""
+Assumes each list is sorted and non-overlapping
+"""
+function interval_intersections(intsa, intsb)
+    na = length(intsa)
+    nb = length(intsb)
+    outs = similar(intsa, max(na, nb))
+    nout = 0
+    ib = 1
+    for (ab, ae) in intsa
+        while ib <= nb && intsb[ib][2] <= ab
+            ib += 1
+        end
+        ib > nb && break
+        icheck = ib
+        while icheck <= nb && intsb[icheck][1] < ae
+            nout += 1
+            outs[nout] = interval_intersect(ab, ae, intsb[icheck]...)
+            icheck += 1
+        end
+    end
+    resize!(outs, nout)
+    outs
+end
+
 measure(a::NTuple{2, <:Number}) = a[2] - a[1]
 
 midpoint(a::NTuple{2, <:Number}) = (a[1] + a[2]) / 2
