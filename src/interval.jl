@@ -259,6 +259,8 @@ function interval_indices(
     i_e = searchsortedlast(basis, stop)
     i_b, i_e
 end
+interval_indices(basis::AbstractVector, bnds::NTuple{2, <:Number}) =
+    interval_indices(basis, bnds[1], bnds[2])
 
 """
     throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number ->
