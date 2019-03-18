@@ -84,6 +84,7 @@ export
     interval_indices,
     is_subinterval,
     throttle,
+    intervals_are_ordered,
 
     ## Indices stuff
     clip_ndx,

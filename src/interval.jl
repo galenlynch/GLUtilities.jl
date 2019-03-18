@@ -52,10 +52,27 @@ function interval_intersect(a::NTuple{2, T}, b::NTuple{2, T}) where T
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
+function intervals_are_ordered(ints)
+    nint = length(ints)
+    nint == 0 && return true
+    last_start, last_end = ints[1]
+    ok = last_start <= last_end
+    for (a, b) in ints[2:end]
+        ok || break
+        ok &= a >= last_end
+        ok &= a <= b
+        last_start = a
+        last_end = b
+    end
+    ok
+end
+
 """
 Assumes each list is sorted and non-overlapping
 """
 function interval_intersections(intsa, intsb)
+    intervals_are_ordered(intsa) || error("insta not valid")
+    intervals_are_ordered(intsb) || error("instb not valid")
     na = length(intsa)
     nb = length(intsb)
     outs = similar(intsa, max(na, nb))
