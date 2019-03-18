@@ -218,7 +218,7 @@ function make_slice_idx(
     ndims::Integer, dimno::Integer, idx::T
 ) where {T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
     @compat idxes = Array{Union{Colon, T}}(undef, ndims)
-    idxes[:] .= Colon()
+    idxes .= Colon()
     idxes[dimno] = idx
     return (idxes...,)
 end
