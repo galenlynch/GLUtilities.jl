@@ -690,3 +690,36 @@ function filtermap(p::Function, f::Function, xs::AbstractVector)
     resize!(out, nout)
     out
 end
+
+"""
+    find_not_unique(a::AbstractArray)
+
+Returns the indices of all redundant elements in a. The time a value is
+seen, it is not considered redundant
+"""
+function find_not_unique(a::AbstractArray{T}) where T
+    na = length(a)
+
+    # Stores the first seen index, and if the index is a known
+    # duplicate
+    seen_els = Dict{T, Tuple{Int, Bool}}()
+    sizehint!(seen_els, na)
+    redundant_ndxs = Vector{Int}(undef, na)
+    outno = 0
+    for (i, el) in enumerate(a)
+        if haskey(seen_els, el)
+            (first_ndx, duplicated) = seen_els[el]
+            if ! duplicated
+                seen_els[el] = (first_ndx, true)
+                outno += 1
+                redundant_ndxs[outno] = first_ndx
+            end
+            outno += 1
+            redundant_ndxs[outno] = i
+        else
+            seen_els[el] = (i, false)
+        end
+    end
+    resize!(redundant_ndxs, outno)
+    redundant_ndxs
+end

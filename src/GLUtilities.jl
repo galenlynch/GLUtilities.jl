@@ -154,6 +154,7 @@ export
     filter_no_collisions,
     window_counts,
     filtermap,
+    find_not_unique,
 
     ## Mmap stuff
     typemmap,
