@@ -661,3 +661,32 @@ function window_counts(ts, window_dur, tb, te)
     cnts = window_counts(subset, window_dur)
     cnts, ib
 end
+
+"""
+    filtermap(p::Function, f::Function, xs)
+
+Filters the input vector, then maps the remaining values. For each element
+of `xs` which predicate function `p` returns true for, use mapping function `f`
+to transform the result."""
+function filtermap(p::Function, f::Function, xs::AbstractVector)
+    if isempty(xs)
+        return similar(xs, Base.promote_op(f, eltype(xs)))
+    end
+    @inbounds begin
+        m_el1 = f(xs[1])
+        out = similar(xs, typeof(m_el1))
+        nout = 0
+        if p(xs[1])
+            nout = 1
+            out[1] = m_el1
+        end
+        for elno in 2:length(xs)
+            if p(xs[elno])
+                nout += 1
+                out[nout] = f(xs[elno])
+            end
+        end
+    end
+    resize!(out, nout)
+    out
+end

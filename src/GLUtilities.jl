@@ -153,6 +153,7 @@ export
     stepsize,
     filter_no_collisions,
     window_counts,
+    filtermap,
 
     ## Mmap stuff
     typemmap,
