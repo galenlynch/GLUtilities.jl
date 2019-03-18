@@ -41,12 +41,15 @@ function find_overlaps(a::AbstractVector{<:Tuple{<:Any, <:Any}})
 end
 
 function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
-    if check_overlap(start1, stop1, start2, stop2)
-        res = (max(start1, start2), min(stop1, stop2))
-    else
-        res = nothing
-    end
-    res
+    ifelse(
+        check_overlap(start1, stop1, start2, stop2),
+        (max(start1, start2), min(stop1, stop2)),
+        nothing
+    )
+end
+
+function interval_intersect(a::NTuple{2, T}, b::NTuple{2, T}) where T
+    interval_intersect(a[1], a[2], b[1], b[2])
 end
 
 """
