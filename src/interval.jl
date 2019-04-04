@@ -52,12 +52,17 @@ function interval_intersect(a::NTuple{2, T}, b::NTuple{2, T}) where T
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
+"""
+Checks that each interval is well ordered, the set of intervals is sorted,
+and the intervals are non-overlapping.
+Returns a boolean.
+"""
 function intervals_are_ordered(ints)
     nint = length(ints)
     nint == 0 && return true
-    last_start, last_end = ints[1]
+    ((last_start, last_end), itr) = Iterators.peel(ints)
     ok = last_start <= last_end
-    for (a, b) in ints[2:end]
+    for (a, b) in itr
         ok || break
         ok &= a >= last_end
         ok &= a <= b
@@ -66,6 +71,7 @@ function intervals_are_ordered(ints)
     end
     ok
 end
+intervals_are_ordered(f, ints) = intervals_are_ordered(f(int) for int in ints)
 
 """
 Assumes each list is sorted and non-overlapping
