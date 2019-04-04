@@ -10,9 +10,16 @@ function iso_fine_datestring(datestr::AbstractString)
 end
 
 function matlab_datevec_to_datetime(datevec::Array{T}) where {T<:Real}
-    secs = datevec[6]
-    raw_millis = round(Int, 1000 * secs)
-    rounded_secs = fld(raw_millis, 1000)
-    millis = mod(raw_millis, 1000)
-    return DateTime(datevec[1:5]..., rounded_secs, millis)::DateTime
+    float_secs = datevec[6]
+    millis = round(Int, 1000 * float_secs)
+    full_secs, trailing_millis = divrem(millis, 1000)
+    DateTime(
+        datevec[1],
+        datevec[2],
+        datevec[3],
+        datevec[4],
+        datevec[5],
+        full_secs,
+        trailing_millis
+    )
 end
