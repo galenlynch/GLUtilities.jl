@@ -11,7 +11,8 @@ end
 
 function matlab_datevec_to_datetime(datevec::Array{T}) where {T<:Real}
     secs = datevec[6]
-    rounded_secs = floor(secs)
-    millis = round(mod(1000 * secs, 1000))
+    raw_millis = round(Int, 1000 * secs)
+    rounded_secs = fld(raw_millis, 1000)
+    millis = mod(raw_millis, 1000)
     return DateTime(datevec[1:5]..., rounded_secs, millis)::DateTime
 end
