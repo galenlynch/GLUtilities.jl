@@ -74,8 +74,8 @@ end
 
         @test time_range_to_sec(DateTime(2013, 7, 1, 0, 0, 0), 0, DateTime(2013, 7, 1, 0, 0, 1), 0) == 1
 
-        @test matlab_datevec_to_datetime(Float64[2017, 05, 14, 13, 53, 22.222]) ==
-            DateTime(2017, 05, 14, 13, 53, 22, 222)
+        @test datevec_to_precisedatetime(Float64[2017, 05, 14, 13, 53, 22.222]) ==
+            PreciseDateTime(DateTime(2017, 05, 14, 13, 53, 22, 222))
 
         @test ndx_wrap(1, 5) == 1
         @test ndx_wrap(6, 5) == 1
