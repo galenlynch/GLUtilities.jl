@@ -156,6 +156,7 @@ export
     window_counts,
     filtermap,
     find_not_unique,
+    clipsize!,
 
     ## Mmap stuff
     typemmap,

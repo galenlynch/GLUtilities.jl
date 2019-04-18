@@ -723,3 +723,5 @@ function find_not_unique(a::AbstractArray{T}) where T
     resize!(redundant_ndxs, outno)
     redundant_ndxs
 end
+
+clipsize!(a::AbstractVector, n::Integer) = sizehint!(resize!(a, n), n)
