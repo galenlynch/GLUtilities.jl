@@ -1,4 +1,9 @@
-function only_matches(reg::Regex, strs::A) where {T<:AbstractString, A<:AbstractArray{T}}
+"""
+    only_matches(reg::Regex, strs::AbstractArray{<:AbstractString})
+
+Return all matches of `reg` in `strs`, skipping over non-matches.
+"""
+function only_matches(reg::Regex, strs::AbstractArray{<:AbstractString})
     n_s = length(strs)
     matches = Vector{RegexMatch}(undef, n_s)
     out_no = 0
