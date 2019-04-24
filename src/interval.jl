@@ -358,3 +358,31 @@ function expand_intervals!(
     ints_in
 end
 expand_intervals(ints_in, expand) = expand_intervals!(copy(ints_in), expand)
+
+"""
+    parse_ranges_str(s::AbstractString)
+
+Parse strings like "3", "1-5", or "1, 2-10, 12-30" into a vector of the integers
+in specified ranges.
+"""
+function parse_ranges_str(s::AbstractString)
+    bnds = map(split(s, ',', keepempty = false)) do c
+        parse.(Int, strip.(split(c, '-', keepempty = false)))
+    end
+    isempty(bnds) && return Int[]
+    ranges = Set{Int}()
+    for i in eachindex(bnds)
+        nbnd = length(bnds[i])
+        if nbnd == 1
+            @inbounds push!(ranges, bnds[i][1])
+        elseif nbnd == 2
+            @inbounds b, e = extrema(bnds[i])
+            for v in b:e
+                push!(ranges, v)
+            end
+        else
+            error("Too many hyphens")
+        end
+    end
+    sort!(collect(ranges))
+end
