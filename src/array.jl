@@ -725,3 +725,6 @@ function find_not_unique(a::AbstractArray{T}) where T
 end
 
 clipsize!(a::AbstractVector, n::Integer) = sizehint!(resize!(a, n), n)
+
+to_ntuple(::Type{T}, args::Tuple) where T = map(x -> convert(T, x), args)
+to_ntuple(::Type{T}, args...) where T = to_ntuple(T, args)
