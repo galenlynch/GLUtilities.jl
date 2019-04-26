@@ -41,12 +41,12 @@ function add_seconds(pdt::PreciseDateTime, sec::Real)
 end
 add_seconds(dt::DateTime, sec::Real) = add_seconds(PreciseDateTime(dt), sec)
 
-function time_range_to_sec(start::PreciseDateTime, stop::PreciseDateTime)
+function duration(start::PreciseDateTime, stop::PreciseDateTime)
     ns_diff = Dates.Nanosecond(stop.date - start.date) + (stop.time - start.time)
     ns_diff.value / 10^9
 end
 
-function time_range_to_sec(
+function duration(
     tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
 )
     micro_diff = Dates.Microsecond(tend - tstart).value + (microend - microstart)
@@ -89,4 +89,4 @@ function check_overlap(a::TSRange, b::TSRange)
     )
 end
 
-duration(a::TSRange) = a.upper.datetime - a.lower.datetime
+duration(a::TSRange) = a.upper.datetime - a.lower.datetime # seconds

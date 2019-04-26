@@ -57,7 +57,6 @@ export
     RangeBound,
     TSRange,
     add_seconds,
-    time_range_to_sec,
     datevec_to_precisedatetime,
     postgres_time_str,
     matlab_datestring,
