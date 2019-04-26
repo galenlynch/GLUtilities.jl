@@ -7,10 +7,10 @@ end
 allsame(first, args...) = allsame(identity, first, args...)
 
 function allsame(a::AbstractArray)
-    isempty(a) && throw(ArgumentError("input cannot be empty"))
+    isempty(a) && return true
     @inbounds first = a[1]
     for e in a[2:end]
-        if e != first
+        if !isequal(e, first)
             return false
         end
     end
