@@ -77,8 +77,8 @@ intervals_are_ordered(f, ints) = intervals_are_ordered(f(int) for int in ints)
 Assumes each list is sorted and non-overlapping
 """
 function interval_intersections(intsa, intsb)
-    intervals_are_ordered(intsa) || error("insta not valid")
-    intervals_are_ordered(intsb) || error("instb not valid")
+    intervals_are_ordered(intsa) || error("intsa not valid")
+    intervals_are_ordered(intsb) || error("intsb not valid")
     na = length(intsa)
     nb = length(intsb)
     outs = similar(intsa, max(na, nb))
