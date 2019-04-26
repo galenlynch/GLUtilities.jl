@@ -7,7 +7,7 @@ using IterTools: imap
 
 import Base:
     isless,
-    print,
+    show,
     in,
     eltype,
     mapreduce,

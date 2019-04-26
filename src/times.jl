@@ -24,11 +24,13 @@ function isless(a::PreciseDateTime, b::PreciseDateTime)
     a.date < b.date || (a.date == b.date && a.time < b.time)
 end
 
-function print(io::IO, pdt::PreciseDateTime)
+function show(io::IO, pdt::PreciseDateTime)
     if get(io, :postgres, false)
-        print(io, postgres_time_str(pdt))
+        show(io, postgres_time_str(pdt))
     else
-        error("Not yet implemented")
+        show(io, pdt.date)
+        show(io, 'T')
+        show(io, pdt.time)
     end
 end
 
@@ -72,7 +74,7 @@ struct TSRange
     end
 end
 
-function print(io::IO, r::TSRange)
+function show(io::IO, r::TSRange)
     ioc = IOContext(io, :postgres => true)
     lb = ifelse(r.lower.inclusive, '[', '(')
     rb = ifelse(r.upper.inclusive, ']', ')')
