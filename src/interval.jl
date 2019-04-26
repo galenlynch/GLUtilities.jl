@@ -386,3 +386,8 @@ function parse_ranges_str(s::AbstractString)
     end
     sort!(collect(ranges))
 end
+
+measure_to_bounds(a::Number, b::Number) = (a, a + b)
+measure_to_bounds(t::NTuple{2, <:Any}) = measure_to_bounds(t[1], t[2])
+measure_to_bounds(ts::AbstractArray{<:NTuple{2, <:Any}}) = measure_to_bounds.(ts)
+measure_to_bounds(a::AbstractArray, b::AbstractArray) = measure_to_bounds.(a, b)

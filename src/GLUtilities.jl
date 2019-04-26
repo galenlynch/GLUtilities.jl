@@ -86,6 +86,7 @@ export
     throttle,
     intervals_are_ordered,
     parse_ranges_str,
+    measure_to_bounds,
 
     ## Indices stuff
     clip_ndx,
