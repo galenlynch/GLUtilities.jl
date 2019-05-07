@@ -26,13 +26,16 @@ end
 
 function show(io::IO, pdt::PreciseDateTime)
     if get(io, :postgres, false)
-        show(io, postgres_time_str(pdt))
+        print(io, postgres_time_str(pdt))
     else
-        show(io, pdt.date)
-        show(io, 'T')
-        show(io, pdt.time)
+        print(io, pdt.date)
+        print(io, 'T')
+        print(io, pdt.time)
     end
 end
+
+show(io::IO, ::MIME"text/plain", pdt::PreciseDateTime) =
+    print(io, "PreciseDateTime:\n    ", pdt)
 
 function add_seconds(pdt::PreciseDateTime, sec::Real)
     ns_in = ceil(Int, sec * 10^9)
@@ -74,6 +77,7 @@ struct TSRange
     end
 end
 
+
 function show(io::IO, r::TSRange)
     ioc = IOContext(io, :postgres => true)
     lb = ifelse(r.lower.inclusive, '[', '(')
@@ -84,6 +88,9 @@ function show(io::IO, r::TSRange)
     print(ioc, r.upper.datetime)
     print(io, rb)
 end
+
+show(io::IO, ::MIME"text/plain", r::TSRange) =
+    print(io, "TSRange time stamp range:\n    ", r)
 
 function check_overlap(a::TSRange, b::TSRange)
     check_overlap(
