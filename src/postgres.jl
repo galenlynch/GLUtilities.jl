@@ -89,3 +89,7 @@ function parse_postgres_array(s::AbstractString)
     content = m[1]
     strip.(split(content, ',', keepempty = false))
 end
+
+function postgres_tuple_list(itr)
+    '(' * join(imap(string, itr), ',') * ')'
+end

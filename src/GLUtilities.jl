@@ -130,6 +130,7 @@ export
     postgres_tsrange_to_datetime_micros,
     postgres_make_tsrange_str,
     to_ntuple,
+    postgres_tuple_list,
 
     ## Array stuff
     weighted_mean,
