@@ -88,6 +88,7 @@ export
     intervals_are_ordered,
     parse_ranges_str,
     measure_to_bounds,
+    clip_interval_duration,
 
     ## Indices stuff
     clip_ndx,

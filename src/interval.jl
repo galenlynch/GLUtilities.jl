@@ -396,3 +396,28 @@ measure_to_bounds(a::Number, b::Number) = (a, a + b)
 measure_to_bounds(t::NTuple{2, <:Any}) = measure_to_bounds(t[1], t[2])
 measure_to_bounds(ts::AbstractArray{<:NTuple{2, <:Any}}) = measure_to_bounds.(ts)
 measure_to_bounds(a::AbstractArray, b::AbstractArray) = measure_to_bounds.(a, b)
+
+"Clip an interval while trying to maintain its duration"
+function clip_interval_duration(
+    reqb::T, reqe::T, boundmin::T, boundmax::T
+) where T<:Number
+    adj_b = max(zero(T), boundmin - reqb)
+    adj_e = -max(zero(T), reqe - boundmax)
+    adj = adj_b + adj_e
+    clipped_b = reqb  + adj
+    clipped_e = reqe + adj
+    req_int_smaller = reqe - reqb < boundmax - boundmin
+    actual_b = ifelse(req_int_smaller, clipped_b, boundmin)
+    actual_e = ifelse(req_int_smaller, clipped_e, boundmax)
+    return (actual_b, actual_e)
+end
+
+clip_interval_duration(a, b, c, d) = clip_interval_duration(promote(a, b, c, d)...)
+clip_interval_duration(reqb::Number, reqe, boundmax) =
+    clip_interval_duration(reqb, reqe, 0, boundmax)
+clip_interval_duration(int::NTuple{2, <:Any}, intb::NTuple{2, <:Any}) =
+    clip_interval_duration(int..., intb...)
+clip_interval_duration(int::NTuple{2, <:Any}, boundmin, boundmax) =
+    clip_interval_duration(int[1], int[2], boundmax)
+clip_exampl_interval(int::NTuple{2, <:Any}, boundmax::Number) =
+    clip_interval_duration(int, 0, boundmax)
