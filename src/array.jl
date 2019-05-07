@@ -661,6 +661,7 @@ function window_counts(ts, window_dur)
     cnts
 end
 
+"`window_counts` in a certain range`"
 function window_counts(ts, window_dur, tb, te)
     ib = searchsortedfirst(ts, tb)
     ie = searchsortedlast(ts, te)
