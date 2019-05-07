@@ -735,3 +735,14 @@ clipsize!(a::AbstractVector, n::Integer) = sizehint!(resize!(a, n), n)
 
 to_ntuple(::Type{T}, args::Tuple) where T = map(x -> convert(T, x), args)
 to_ntuple(::Type{T}, args...) where T = to_ntuple(T, args)
+
+function flatten_nested_map(funcs::Tuple, nested)
+    if length(funcs) == 1
+        collect(Iterators.Flatten(imap(first(funcs), nested)))
+    else
+        flatten_nested_map(
+            Base.tail(funcs),
+            collect(Iterators.Flatten(imap(first(funcs), nested)))
+        )
+    end
+end
