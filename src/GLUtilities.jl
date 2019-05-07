@@ -3,6 +3,8 @@ module GLUtilities
 
 using Compat, Formatting, Distributions
 
+using Base: @propagate_inbounds
+
 using IterTools: imap
 
 import Base:
