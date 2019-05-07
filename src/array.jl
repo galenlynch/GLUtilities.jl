@@ -583,24 +583,31 @@ function find_local_extrema(
     sig::AbstractVector,
     start_ndx::Integer = div(length(sig), 2);
     findmax::Bool = true,
-    right_on_ties::Bool = true
+    right_on_ties::Bool = true,
 )
     sigl = length(sig)
     sigl < 2 && return start_ndx
     checkbounds(sig, start_ndx)
     comp = ifelse(findmax, >=, <=)
     bias = ifelse(right_on_ties, 1, -1)
-
+    if isnan(sig[start_ndx])
+        newstart = findfirst(!isnan, sig)
+        newstart == nothing && error("Only NaNs")
+    end
     search_ndx = start_ndx
-    @inbounds while true
-        notleft = search_ndx == 1 || comp(sig[search_ndx], sig[search_ndx - 1])
-        notright = search_ndx == sigl || comp(sig[search_ndx], sig[search_ndx + 1])
+    iterno = 0
+    maxiter = 2 * sigl
+    @inbounds while iterno < maxiter
+        notleft = search_ndx == 1 ||  isnan(sig[search_ndx - 1]) || comp(sig[search_ndx], sig[search_ndx - 1])
+        notright = search_ndx == sigl || isnan(sig[search_ndx + 1]) || comp(sig[search_ndx], sig[search_ndx + 1])
         if notleft & notright
             return search_ndx
         else
             search_ndx += ifelse(notleft, 1, ifelse(notright, -1, bias))
         end
+        iterno += 1
     end
+    error("Did not converge")
 end
 
 """
