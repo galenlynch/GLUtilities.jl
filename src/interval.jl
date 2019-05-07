@@ -160,7 +160,9 @@ Assumes ints are sorted by their first index.
 function join_intervals! end
 
 function join_intervals!(
-    f::Function, ints::AbstractVector{<:NTuple{2, <:Number}}, min_gap::Number,
+    f::Function,
+    ints::AbstractVector{<:NTuple{2, <:Number}},
+    min_gap::Number = 0,
 )
     nint = length(ints)
     if nint == 0
@@ -185,16 +187,19 @@ function join_intervals!(
     resize!(ints, outno)
     ints
 end
-join_intervals!(ints::AbstractVector, min_gap) = join_intervals!(identity, ints, min_gap)
+join_intervals!(ints::AbstractVector, args...) =
+    join_intervals!(identity, ints, args...)
 
 """
-    join_intervals(ints::Vector{NTuple{2, <:Number}}, min_gap)
+    join_intervals(f, ints::Vector{NTuple{2, <:Number}}, min_gap)
 
 Like [`join_intervals!`](@ref), but does not mutate input.
 """
-function join_intervals(ints::AbstractVector{<:NTuple{2, <:Number}}, min_gap)
-    join_intervals!(copy(ints), min_gap)
-end
+join_intervals(f, ints::AbstractVector, args...) =
+    join_intervals!(f, copy(ints), args...)
+
+join_intervals(ints::AbstractVector, args...) =
+    join_intervals(identity, ints, args...)
 
 function interval_complements(
     start::T,
