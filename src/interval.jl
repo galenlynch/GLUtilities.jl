@@ -242,6 +242,7 @@ function interval_intersections_overlapping(intsa, intsb)
 end
 
 measure(a::NTuple{2, <:Number}) = a[2] - a[1]
+measure(::Nothing) = 0
 
 midpoint(a::NTuple{2, <:Number}) = (a[1] + a[2]) / 2
 
