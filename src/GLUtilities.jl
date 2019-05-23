@@ -139,6 +139,7 @@ export
     to_ntuple,
     flatten_nested_map,
     postgres_tuple_list,
+    postgres_tuple_rows,
 
     ## Array stuff
     weighted_mean,

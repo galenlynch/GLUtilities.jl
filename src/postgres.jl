@@ -86,6 +86,7 @@ function parse_postgres_array(s::AbstractString)
     strip.(split(content, ',', keepempty = false))
 end
 
-function postgres_tuple_list(itr)
-    '(' * join(imap(string, itr), ',') * ')'
+postgres_tuple_list(itr) = '(' * join(imap(string, itr), ',') * ')'
+function postgres_tuple_rows(itr)
+    join(imap(el -> '(' * join(imap(string, el), ',') * ')', itr), ", ")
 end
