@@ -107,7 +107,7 @@ end
 
 "Clips an index to be within the valid range for an array of length l"
 function clip_ndx end
-clip_ndx(ind::T, l::T) where T<:Integer = clip(ind, one(T), l)
+clip_ndx(ind::T, l::T) where T<:Integer = clamp(ind, one(T), l)
 clip_ndx(ind::Integer, l::Integer) = clip_ndx(promote(ind, l)...)
 
 """
