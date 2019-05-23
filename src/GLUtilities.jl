@@ -76,6 +76,7 @@ export
     ## Interval stuff
     check_overlap,
     interval_intersect,
+    interval_intersect_measure,
     interval_intersections,
     find_all_overlapping,
     measure,

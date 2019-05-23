@@ -79,6 +79,23 @@ function interval_intersect(a::NTuple{2, T}, b::NTuple{2, T}) where T
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
+function interval_intersect_measure(
+    start1::T, stop1::T, start2::T, stop2::T
+) where T
+    ifelse(
+        check_overlap(start1, stop1, start2, stop2),
+        min(stop1, stop2) - max(start1, start2),
+        zero(T)
+    )
+end
+
+interval_intersect_measure(b1, e1, b2, e2) =
+    interval_intersect_measure(promote(b1, e1, b2, e2)...)
+
+function interval_intersect_measure(a::NTuple{2, <:Any}, b::NTuple{2, <:Any})
+    interval_intersect_measure(a[1], a[2], b[1], b[2])
+end
+
 """
 Checks that each interval is well ordered, the set of intervals is sorted,
 and the intervals are non-overlapping.
