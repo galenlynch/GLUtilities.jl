@@ -40,6 +40,33 @@ function find_overlaps(a::AbstractVector{<:Tuple{<:Any, <:Any}})
     overlap_idx
 end
 
+function find_all_overlapping(fa, fb, intsa, intsb)
+    intervals_are_ordered(fa, intsa) || error("intsa not valid")
+    intervals_are_ordered(fb, intsb) || error("intsb not valid")
+    na = length(intsa)
+    nb = length(intsb)
+    outs = falses(na)
+    ib = 1
+    @inbounds for ia in eachindex(intsa)
+        ab, ae = fa(intsa[ia])
+        while ib <= nb && fb(intsb[ib])[2] <= ab
+            ib += 1
+        end
+        ib > nb && break
+        any_overlap = false
+        for icheck = ib:nb
+            bb, be = fb(intsb[icheck])
+            bb < ae || break
+            any_overlap = true
+        end
+        outs[ia] = any_overlap
+    end
+    outs
+end
+
+find_all_overlapping(intsa, intsb) =
+    find_all_overlapping(identity, identity, intsa, intsb)
+
 function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
     ifelse(
         check_overlap(start1, stop1, start2, stop2),

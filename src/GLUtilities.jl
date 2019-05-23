@@ -77,6 +77,7 @@ export
     check_overlap,
     interval_intersect,
     interval_intersections,
+    find_all_overlapping,
     measure,
     midpoint,
     clip,
