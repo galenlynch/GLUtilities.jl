@@ -311,25 +311,25 @@ function join_intervals!(
 )
     nint = length(ints)
     if nint == 0
-        resize!(ints, 0)
+        clipsize!(ints, 0)
         return ints
     end
     outno = 0
     joined_start = ints[1][1]
-    last_end = ints[1][2]
+    prev_end = ints[1][2]
     for intno in 2:nint
         int = ints[intno]
-        if int[1] - last_end > min_gap
+        if int[1] - prev_end > min_gap
             # End last stretch
             outno += 1
-            ints[outno] = f((joined_start, last_end))
+            ints[outno] = f((joined_start, prev_end))
             joined_start = int[1]
         end
-        last_end = int[2]
+        prev_end = int[2]
     end
     outno += 1
-    ints[outno] = f((joined_start, last_end))
-    resize!(ints, outno)
+    ints[outno] = f((joined_start, prev_end))
+    clipsize!(ints, outno)
     ints
 end
 join_intervals!(ints::AbstractVector, args...) =
@@ -385,7 +385,7 @@ function interval_complements(
             stop - contraction
         )
     end
-    resize!(complement, gapno)
+    clipsize!(complement, gapno)
     complement
 end
 
@@ -443,7 +443,7 @@ function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
     end
     nout += 1
     @inbounds out[nout] = (joined_start, last_x)
-    resize!(out, nout)
+    clipsize!(out, nout)
     out
 end
 
@@ -495,7 +495,7 @@ function intervals_diff(
         # Skip over used intervals in b
         b_no = ifelse(last_b > b_no, last_b, b_no)
     end
-    resize!(ints_out, out_no)
+    clipsize!(ints_out, out_no)
     ints_out
 end
 
