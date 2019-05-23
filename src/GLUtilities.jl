@@ -78,6 +78,7 @@ export
     interval_intersect,
     interval_intersect_measure,
     interval_intersections,
+    interval_intersections_overlapping,
     find_all_overlapping,
     measure,
     midpoint,

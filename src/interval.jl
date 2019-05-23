@@ -157,7 +157,87 @@ function interval_intersections(intsa, intsb)
             icheck += 1
         end
     end
-    resize!(outs, nout)
+    clipsize!(outs, nout)
+    outs
+end
+
+function flush_growing_intersect_intervals!(outs, nout, working, newminimum)
+    i = 1
+    new_nout = nout
+    working_len = length(working)
+    while i <= working_len
+        if working[i][2] < newminimum
+            new_nout += 1
+            outs[new_nout] = working[i]
+            deleteat!(working, i)
+            working_len -= 1
+        else
+            i += 1
+        end
+    end
+    new_nout
+end
+
+overlap_interval_union(ab, ae, bb, be) = (min(ab, bb), max(ae, be))
+overlap_interval_union(inta, intb) =
+    overlap_interval_union(inta[1], inta[2], intb[1], intb[2])
+
+function push_growing_intersect_interval!(working, newint)
+    mergeno = 0
+    i = 1
+    working_int = newint
+    working_len = length(working)
+    while i <= working_len
+        if check_overlap(working[i], working_int)
+            working_int = overlap_interval_union(working[i], working_int)
+            if mergeno == 0
+                mergeno = i
+                i += 1
+            else
+                deleteat!(working, i)
+                working_len -= 1
+            end
+        else
+            i += 1
+        end
+    end
+    if mergeno > 0
+        working[mergeno] = working_int
+    else
+        push!(working, working_int)
+    end
+end
+
+function interval_intersections_overlapping(intsa, intsb)
+    intervals_are_partially_ordered(intsa) || error("intsa not valid")
+    intervals_are_partially_ordered(intsb) || error("intsb not valid")
+    na = length(intsa)
+    nb = length(intsb)
+    outs = similar(intsa, na + nb)
+    nout = 0
+    ib = 1
+    working_intersects = similar(intsa, 0)
+    for (ab, ae) in intsa
+        nout = flush_growing_intersect_intervals!(
+            outs, nout, working_intersects, ab
+        )
+        while ib <= nb && intsb[ib][2] <= ab
+            ib += 1
+        end
+        ib > nb && break
+        icheck = ib
+        while icheck <= nb && intsb[icheck][1] < ae
+            bb, be = intsb[icheck]
+            newint = interval_intersect(ab, ae, bb, be)
+            push_growing_intersect_interval!(working_intersects, newint)
+            icheck += 1
+        end
+    end
+    for i in eachindex(working_intersects)
+        nout += 1
+        outs[nout] = working_intersects[i]
+    end
+    clipsize!(outs, nout)
     outs
 end
 
