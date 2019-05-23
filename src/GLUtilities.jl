@@ -95,6 +95,7 @@ export
     is_subinterval,
     throttle,
     intervals_are_ordered,
+    intervals_are_partially_ordered,
     parse_ranges_str,
     measure_to_bounds,
     clip_interval_duration,

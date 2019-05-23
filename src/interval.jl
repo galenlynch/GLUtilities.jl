@@ -99,26 +99,40 @@ function interval_intersect_measure(a::NTuple{2, <:Any}, b::NTuple{2, <:Any})
     interval_intersect_measure(a[1], a[2], b[1], b[2])
 end
 
+@inline partially_ordered_crit(a, prevstart, _) = a >= prevstart
+@inline well_ordered_crit(a, _, prevend) = a >= prevend
+
 """
 Checks that each interval is well ordered, the set of intervals is sorted,
 and the intervals are non-overlapping.
 Returns a boolean.
 """
-function intervals_are_ordered(ints)
-    nint = length(ints)
-    nint == 0 && return true
-    ((last_start, last_end), itr) = Iterators.peel(ints)
-    ok = last_start <= last_end
-    for (a, b) in itr
-        ok || break
-        ok &= a >= last_end
+function _intervals_are_ordered(f, crit, ints)
+    iter_result = iterate(ints)
+    iter_result == nothing && return true
+    element, state = iter_result
+    prev_start, prev_end = f(element)
+    ok = prev_start <= prev_end
+    iter_result = iterate(ints, state)
+    while ok & (iter_result != nothing)
+        (element, state) = iter_result
+        a, b = f(element)
         ok &= a <= b
-        last_start = a
-        last_end = b
+        ok &= crit(a, prev_start, prev_end)
+        prev_start = a
+        prev_end = b
+        iter_result = iterate(ints, state)
     end
     ok
 end
-intervals_are_ordered(f, ints) = intervals_are_ordered(f(int) for int in ints)
+
+intervals_are_ordered(f, ints) = _intervals_are_ordered(f, well_ordered_crit, ints)
+intervals_are_ordered(ints) = intervals_are_ordered(identity, ints)
+
+intervals_are_partially_ordered(f, ints) =
+    _intervals_are_ordered(f, partially_ordered_crit, ints)
+intervals_are_partially_ordered(ints) =
+    intervals_are_partially_ordered(identity, ints)
 
 """
 Assumes each list is sorted and non-overlapping
