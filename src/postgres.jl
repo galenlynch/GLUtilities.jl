@@ -1,19 +1,17 @@
-const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SS.sss"
+const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SS.ssszzzz"
 const MICRO_FORMAT = FormatExpr("{1:s}{2:03d}")
 const PSQL_DATETIME_REG = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.?\d{0,3})(\d*)"
 const PSQL_RANGE_REG = r"([\[\(])\"([^\"]*)\",\s*\"([^\"]*)\"([\)\]])"
 const POSTGRES_ARRAY_REG = r"\{([^\}]*)\}"
 
-function postgres_time_str(dt::DateTime, micros::Integer = 0)
-    @assert micros < 1000 "Trailing microseconds only"
-    datetime_str = Dates.format(dt, POSTGRES_DATE_FORMAT)
-    return format(MICRO_FORMAT, datetime_str, micros)
+function postgres_time_str(dt::ZonedDateTime, micros::Integer = 0)
+    add_seconds(dt, micros * 10^-6)
 end
 
 function postgres_time_str(pdt::PreciseDateTime)
-    micros = cld(pdt.time.instant.value, 10^3)
+    micros = cld(pdt.nanos.value, 10^3)
     (millis, trailing_micros) = divrem(micros, 10^3)
-    dt = DateTime(pdt.date) + Dates.Millisecond(millis)
+    dt = pdt.datetime + Dates.Millisecond(millis)
     postgres_time_str(dt, trailing_micros)
 end
 
@@ -76,11 +74,9 @@ end
 function postgres_tsrange_to_datetime_micros(timerange_str::AbstractString)
     tr = TSRange(timerange_str)
     (
-        DateTime(tr.lower.datetime),
-        micros(tr.lower.datetime),
-        DateTime(tr.upper.datetime),
-        micros(tr.upper.datetime)
-     )
+        dt_and_micros(tr.lower.datetime)...,
+        dt_and_micros(tr.lower.datetime)...
+    )
 end
 
 function parse_postgres_array(s::AbstractString)

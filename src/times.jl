@@ -1,50 +1,82 @@
 const FILE_DATEFORMAT = DateFormat("yyyy-mm-ddTHH-MM-SS")
 const JULIA_DT_REG = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
 
-struct PreciseDateTime
-    date::Date
-    time::Time
+struct PreciseDateTime <: Dates.AbstractDateTime
+    datetime::ZonedDateTime
+    nanos::Nanosecond
 end
-PreciseDateTime(dt::DateTime) = PreciseDateTime(Date(dt), Time(dt))
-function PreciseDateTime(dt::DateTime, micros::Real)
-    add_seconds(PreciseDateTime(dt), micros / 10^6)
-end
+
+PreciseDateTime(dt::ZonedDateTime) = PreciseDateTime(dt, Nanosecond(0))
+PreciseDateTime(dt::DateTime, tz::TimeZone = localzone(), args...) =
+    PreciseDateTime(ZonedDateTime(dt, tz), args...)
+PreciseDateTime(dt::DateTime, nanos::Real) =
+    PreciseDateTime(dt) + Nanosecond(round(Int, nanos))
 
 function -(x::PreciseDateTime, y::PreciseDateTime)
-    Second(x.date - y.date).value + (x.time - y.time).value * 1e-9
+    Millisecond(x.datetime - y.datetime).value * 1e-3 +
+        (x.nanos - y.nanos).value * 1e-9
 end
 
-DateTime(pdt::PreciseDateTime) = DateTime(pdt.date) + pdt.time.instant
+DateTime(pdt::PreciseDateTime) = TimeZones.localtime(pdt.datetime)
 
-micros(pdt::PreciseDateTime) = Dates.microsecond(pdt.time)
+trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
 
-dt_and_micros(pdt::PreciseDateTime) = (DateTime(pdt), micros(pdt))
+dt_and_micros(pdt::PreciseDateTime) = (DateTime(pdt), trailing_micros(pdt))
 
 function isless(a::PreciseDateTime, b::PreciseDateTime)
-    a.date < b.date || (a.date == b.date && a.time < b.time)
+    a.datetime < b.datetime || (a.datetime == b.datetime && a.nanos < b.nanos)
 end
 
-function show(io::IO, pdt::PreciseDateTime)
-    if get(io, :postgres, false)
-        print(io, postgres_time_str(pdt))
-    else
-        print(io, pdt.date)
-        print(io, 'T')
-        print(io, pdt.time)
+function n_trailing_zero(number)
+    n_digit = 0
+    working_number = number
+    while working_number != 0
+        working_number, r = divrem(working_number, 10)
+        r != 0 && break
+        n_digit += 1
     end
+    return n_digit
+end
+
+function clip_trailing(number)
+    n_trail = n_trailing_zero(number)
+    div(number, 10 ^ n_trail)
+end
+
+const TZ_DATEFMT = DateFormat("zzzz")
+
+function show(io::IO, pdt::PreciseDateTime)
+    dt = TimeZones.localtime(pdt.datetime)
+    print(io, dt)
+    millis = convert(Millisecond, dt)
+    trailing_millis = millis - convert(Millisecond, floor(millis, Second))
+    raw_millis = trailing_millis.value
+    n_trailing_zero_milli = n_trailing_zero(raw_millis)
+    raw_nanos = pdt.nanos.value
+    nano_str = raw_nanos == 0 ?
+        "" :
+        repeat('0', n_trailing_zero_milli) * @sprintf("%03d", raw_nanos)
+    print(io, nano_str)
+    print(io, Dates.format(pdt.datetime, TZ_DATEFMT))
 end
 
 show(io::IO, ::MIME"text/plain", pdt::PreciseDateTime) =
     print(io, "PreciseDateTime:\n    ", pdt)
 
-function add_seconds(pdt::PreciseDateTime, sec::Real)
-    ns_in = ceil(Int, sec * 10^9)
-    (d, ns_comb) = divrem(pdt.time.instant.value + ns_in, 86400000000000)
-    new_d = pdt.date + Dates.Day(d)
-    new_t = Time(Dates.Nanosecond(ns_comb))
-    PreciseDateTime(new_d, new_t)
+function +(pdt::PreciseDateTime, ns::Nanosecond)
+    sum_nanos = ns + pdt.nanos
+    sum_millis = floor(sum_nanos, Millisecond)
+    trailing_nanos = sum_nanos - convert(Nanosecond, sum_millis)
+    new_zdt = pdt.datetime + sum_millis
+    PreciseDateTime(new_zdt, trailing_nanos)
 end
-add_seconds(dt::DateTime, sec::Real) = add_seconds(PreciseDateTime(dt), sec)
+
++(pdt::PreciseDateTime, p::TimePeriod) = pdt + convert(Nanosecond, p)
+
+add_nanos(pdt::PreciseDateTime, ns::Real) = pdt + Nanosecond(round(Int, ns))
+add_nanos(dt::Dates.AbstractDateTime, nanos::Real) =
+    add_nanos(PreciseDateTime(dt), nanos)
+add_seconds(dt::Dates.AbstractDateTime, sec::Real) = add_nanos(dt, sec * 10^9)
 
 function duration(start::PreciseDateTime, stop::PreciseDateTime)
     ns_diff = Dates.Nanosecond(stop.date - start.date) + (stop.time - start.time)

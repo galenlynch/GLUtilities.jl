@@ -7,6 +7,12 @@ using Base: @propagate_inbounds
 
 using IterTools: imap
 
+using TimeZones
+
+using Printf
+
+import Dates: AbstractDateTime
+
 import Base:
     isless,
     show,
@@ -21,7 +27,8 @@ import Base:
     IteratorSize,
     IteratorEltype,
     SizeUnknown,
-    -
+    -,
+    +
 
 @static if VERSION >= v"0.7.0-DEV.2575"
     using
@@ -63,7 +70,7 @@ export
     postgres_time_str,
     matlab_datestring,
     iso_fine_datestring,
-    micros,
+    trailing_micros,
     dt_and_micros,
 
     ## Interval stuff
