@@ -75,7 +75,10 @@ function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
     )
 end
 
-function interval_intersect(a::NTuple{2, T}, b::NTuple{2, T}) where T
+interval_intersect(b1, e1, b2, e2) =
+    interval_intersect(promote(b1, e1, b2, e2)...)
+
+function interval_intersect(a::NTuple{2, <:Any}, b::NTuple{2, <:Any})
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
