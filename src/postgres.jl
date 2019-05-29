@@ -24,9 +24,9 @@ function PreciseDateTime(datestring::AbstractString)
 end
 
 function postgres_make_tsrange_str(
-    start_dt::DateTime,
+    start_dt::ZonedDateTime,
     start_micros::Integer,
-    stop_dt::DateTime,
+    stop_dt::ZonedDateTime,
     stop_micros::Integer;
     start_bracket::Char = '[',
     stop_bracket::Char = ')'
@@ -38,9 +38,13 @@ function postgres_make_tsrange_str(
 end
 
 function postgres_make_tsrange_str(tsr::TSRange)
+    start_dt, start_micros = dt_and_micros(tsr.lower.datetime)
+    stop_dt, stop_micros = dt_and_micros(tsr.upper.datetime)
     postgres_make_tsrange_str(
-        dt_and_micros(tsr.lower.datetime)...,
-        dt_and_micros(tsr.upper.datetime)...;
+        start_dt,
+        round(Int, start_micros),
+        stop_dt,
+        round(Int, stop_micros);
         start_bracket = ifelse(tsr.lower.inclusive, '[', '('),
         stop_bracket = ifelse(tsr.upper.inclusive, ']', ')')
     )

@@ -18,10 +18,11 @@ function -(x::PreciseDateTime, y::PreciseDateTime)
 end
 
 DateTime(pdt::PreciseDateTime) = TimeZones.localtime(pdt.datetime)
+ZonedDateTime(pdt::PreciseDateTime) = pdt.datetime
 
 trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
 
-dt_and_micros(pdt::PreciseDateTime) = (DateTime(pdt), trailing_micros(pdt))
+dt_and_micros(pdt::PreciseDateTime) = (ZonedDateTime(pdt), trailing_micros(pdt))
 
 function isless(a::PreciseDateTime, b::PreciseDateTime)
     a.datetime < b.datetime || (a.datetime == b.datetime && a.nanos < b.nanos)
