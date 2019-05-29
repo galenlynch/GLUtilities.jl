@@ -598,8 +598,14 @@ function find_local_extrema(
     iterno = 0
     maxiter = 2 * sigl
     @inbounds while iterno < maxiter
-        notleft = search_ndx == 1 ||  isnan(sig[search_ndx - 1]) || comp(sig[search_ndx], sig[search_ndx - 1])
-        notright = search_ndx == sigl || isnan(sig[search_ndx + 1]) || comp(sig[search_ndx], sig[search_ndx + 1])
+        notleft = search_ndx == 1 ||
+            ismissing(sig[search_ndx - 1]) ||
+            isnan(sig[search_ndx - 1]) ||
+            comp(sig[search_ndx], sig[search_ndx - 1])
+        notright = search_ndx == sigl ||
+            ismissing(sig[search_ndx + 1]) ||
+            isnan(sig[search_ndx + 1]) ||
+            comp(sig[search_ndx], sig[search_ndx + 1])
         if notleft & notright
             return search_ndx
         else
