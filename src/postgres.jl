@@ -5,7 +5,11 @@ const PSQL_RANGE_REG = r"([\[\(])\"([^\"]*)\",\s*\"([^\"]*)\"([\)\]])"
 const POSTGRES_ARRAY_REG = r"\{([^\}]*)\}"
 
 function postgres_time_str(dt::ZonedDateTime, micros::Integer = 0)
-    add_seconds(dt, micros * 10^-6)
+    repr(add_seconds(dt, micros * 10^-6))
+end
+
+function postgres_time_str(dt::DateTime, micros::Integer = 0, zone = localzone())
+    postgres_time_str(ZonedDateTime(dt, zone), micros)
 end
 
 function postgres_time_str(pdt::PreciseDateTime)
