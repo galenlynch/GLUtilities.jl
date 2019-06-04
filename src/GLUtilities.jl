@@ -93,6 +93,7 @@ export
     interval_complements,
     intervals_diff,
     mask_events,
+    overlap_interval_union,
     find_overlaps,
     interval_indices,
     is_subinterval,
@@ -144,6 +145,7 @@ export
     postgres_make_tsrange_str,
     to_ntuple,
     flatten_nested_map,
+    nested_map,
     postgres_tuple_list,
     postgres_tuple_rows,
 

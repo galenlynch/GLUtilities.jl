@@ -590,9 +590,9 @@ function find_local_extrema(
     checkbounds(sig, start_ndx)
     comp = ifelse(findmax, >=, <=)
     bias = ifelse(right_on_ties, 1, -1)
-    if isnan(sig[start_ndx])
-        newstart = findfirst(!isnan, sig)
-        newstart == nothing && error("Only NaNs")
+    if ismissing(sig[start_ndx]) || isnan(sig[start_ndx])
+        newstart = findfirst(x -> !(ismissing(x) | isnan(x)), sig)
+        newstart == nothing && error("None valid")
     end
     search_ndx = start_ndx
     iterno = 0
@@ -752,4 +752,8 @@ function flatten_nested_map(funcs::Tuple, nested)
             collect(Iterators.Flatten(imap(first(funcs), nested)))
         )
     end
+end
+
+function nested_map(f, arrs::AbstractArray{<:AbstractArray})
+    map(arr -> map(f, arr), arrs)
 end
