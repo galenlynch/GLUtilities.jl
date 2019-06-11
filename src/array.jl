@@ -757,3 +757,22 @@ end
 function nested_map(f, arrs::AbstractArray{<:AbstractArray})
     map(arr -> map(f, arr), arrs)
 end
+
+function find_all_edge_triggers(arr, thr, comp = >=)
+    indices = Int[]
+    @inbounds for i = 2:length(arr)
+        if comp(arr[i], thr) & !comp(arr[i - 1], thr)
+            push!(indices, i)
+        end
+    end
+    indices
+end
+
+function find_first_edge_trigger(arr, thr, comp = >=)
+    @inbounds for i = 2:length(arr)
+        if comp(arr[i], thr) & !comp(arr[i - 1], thr)
+            return i
+        end
+    end
+    nothing
+end

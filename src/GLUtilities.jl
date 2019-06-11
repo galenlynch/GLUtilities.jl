@@ -170,6 +170,8 @@ export
     thresh_cross,
     centered_basis,
     imap_product,
+    find_all_edge_triggers,
+    find_first_edge_trigger,
     glhist!,
     glhist,
     find_local_extrema,
