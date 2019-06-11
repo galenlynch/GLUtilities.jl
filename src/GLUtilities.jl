@@ -1,7 +1,7 @@
 __precompile__()
 module GLUtilities
 
-using Compat, Formatting, Distributions
+using Compat, Distributions
 
 using Base: @propagate_inbounds
 
@@ -55,7 +55,6 @@ export
     # Constants
     POSTGRES_DATE_FORMAT,
     PSQL_DATETIME_REG,
-    MICRO_FORMAT,
     JULIA_DT_REG,
 
     # Functions

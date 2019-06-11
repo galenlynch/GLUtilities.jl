@@ -1,30 +1,38 @@
-const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SS.ssszzzz"
-const MICRO_FORMAT = FormatExpr("{1:s}{2:03d}")
-const PSQL_DATETIME_REG = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.?\d{0,3})(\d*)"
+const POSTGRES_DATE_FORMAT = dateformat"YYYY-mm-dd HH:MM:SSz"
+const POSTGRES_DATE_FORMAT_NO_TZ = dateformat"YYYY-mm-dd HH:MM:SS.s"
+const PSQL_DATETIME_REG =
+    r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\.?(\d{0,3})(\d{0,3})([-+]\d{2}(?::\d{2})?)?"
 const PSQL_RANGE_REG = r"([\[\(])\"([^\"]*)\",\s*\"([^\"]*)\"([\)\]])"
 const POSTGRES_ARRAY_REG = r"\{([^\}]*)\}"
 
+postgres_time_str(pdt::PreciseDateTime) = repr(pdt)
+
 function postgres_time_str(dt::ZonedDateTime, micros::Integer = 0)
-    repr(add_seconds(dt, micros * 10^-6))
+    postgres_time_str(add_seconds(dt, micros * 10^-6))
 end
 
 function postgres_time_str(dt::DateTime, micros::Integer = 0, zone = localzone())
     postgres_time_str(ZonedDateTime(dt, zone), micros)
 end
 
-function postgres_time_str(pdt::PreciseDateTime)
-    micros = cld(pdt.nanos.value, 10^3)
-    (millis, trailing_micros) = divrem(micros, 10^3)
-    dt = pdt.datetime + Dates.Millisecond(millis)
-    postgres_time_str(dt, trailing_micros)
-end
-
 function PreciseDateTime(datestring::AbstractString)
     m = match(PSQL_DATETIME_REG, datestring)
-    m == nothing && return nothing
-    dt = DateTime(m[1], POSTGRES_DATE_FORMAT)
-    micros = isempty(m[2]) ? 0 : parse(Int, rpad(m[2], 3, '0'))
-    PreciseDateTime(dt, micros)
+    m == nothing && throw(ArgumentError("Could not parse $datestring"))
+    millis_match = something(m[2], "")
+    micros_match = something(m[3], "")
+    if isnothing(m[4])
+        millis_str = '.' * millis_match
+        dt = DateTime(m[1] * millis_str, POSTGRES_DATE_FORMAT_NO_TZ)
+    else
+        zdt = ZonedDateTime(m[1] * m[4], POSTGRES_DATE_FORMAT)
+        millis_val = isempty(millis_match) ? 0 :
+            parse(Int, rpad(millis_match, 3, '0'))
+        dt = zdt + Millisecond(millis_val)
+    end
+    nanos = isempty(micros_match) ?
+        0 :
+        parse(Int, rpad(micros_match, 3, '0')) * 1000
+    PreciseDateTime(dt, nanos)
 end
 
 function postgres_make_tsrange_str(

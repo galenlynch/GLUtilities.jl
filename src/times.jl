@@ -7,10 +7,10 @@ struct PreciseDateTime <: Dates.AbstractDateTime
 end
 
 PreciseDateTime(dt::ZonedDateTime) = PreciseDateTime(dt, Nanosecond(0))
-PreciseDateTime(dt::DateTime, tz::TimeZone = localzone(), args...) =
-    PreciseDateTime(ZonedDateTime(dt, tz), args...)
-PreciseDateTime(dt::DateTime, nanos::Real) =
+PreciseDateTime(dt::ZonedDateTime, nanos::Real) =
     PreciseDateTime(dt) + Nanosecond(round(Int, nanos))
+PreciseDateTime(dt::DateTime, args...) =
+    PreciseDateTime(ZonedDateTime(dt, localzone()), args...)
 
 function -(x::PreciseDateTime, y::PreciseDateTime)
     Millisecond(x.datetime - y.datetime).value * 1e-3 +
@@ -53,11 +53,16 @@ function show(io::IO, pdt::PreciseDateTime)
     trailing_millis = millis - convert(Millisecond, floor(millis, Second))
     raw_millis = trailing_millis.value
     n_trailing_zero_milli = n_trailing_zero(raw_millis)
+    millis_str = raw_millis == 0 ? ".000" : repeat('0', n_trailing_zero_milli)
     raw_nanos = pdt.nanos.value
-    nano_str = raw_nanos == 0 ?
-        "" :
-        repeat('0', n_trailing_zero_milli) * @sprintf("%03d", raw_nanos)
-    print(io, nano_str)
+    nano_str = raw_nanos == 0 ? "" : millis_str * @sprintf("%06d", raw_nanos)
+    if isempty(nano_str)
+        clipped_nano_str = nano_str
+    else
+        last_nonzero = findlast(!isequal('0'), nano_str)
+        clipped_nano_str = SubString(nano_str, 1, last_nonzero)
+    end
+    print(io, clipped_nano_str)
     print(io, Dates.format(pdt.datetime, TZ_DATEFMT))
 end
 
