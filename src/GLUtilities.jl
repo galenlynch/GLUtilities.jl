@@ -92,6 +92,7 @@ export
     interval_complements,
     intervals_diff,
     mask_events,
+    maximum_interval_overlap,
     overlap_interval_union,
     find_overlaps,
     interval_indices,

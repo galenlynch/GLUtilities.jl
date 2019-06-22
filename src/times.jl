@@ -115,6 +115,9 @@ struct TSRange
     end
 end
 
+function TSRange(lower::PreciseDateTime, upper::PreciseDateTime)
+    TSRange(RangeBound(lower, true), RangeBound(upper, true))
+end
 
 function show(io::IO, r::TSRange)
     ioc = IOContext(io, :postgres => true)

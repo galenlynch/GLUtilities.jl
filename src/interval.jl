@@ -566,3 +566,17 @@ clip_interval_duration(int::NTuple{2, <:Any}, boundmin, boundmax) =
     clip_interval_duration(int[1], int[2], boundmax)
 clip_exampl_interval(int::NTuple{2, <:Any}, boundmax::Number) =
     clip_interval_duration(int, 0, boundmax)
+
+function maximum_interval_overlap(
+    xs::AbstractVector{NTuple{2, T}}, y::NTuple{2, T}
+) where T
+    best_ndx = 0
+    best_overlap = typemin(T)
+    for i in eachindex(xs)
+        overlap = interval_intersect_measure(xs[i], y)
+        better = overlap > best_overlap
+        best_overlap = ifelse(better, overlap, best_overlap)
+        best_ndx = ifelse(better, i, best_ndx)
+    end
+    best_ndx, best_overlap
+end
