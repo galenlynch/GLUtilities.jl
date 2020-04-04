@@ -1,5 +1,5 @@
-julia 0.5 2
-Compat 1.0 2
+julia 0.5
+Compat 1
 Distributions 0.16
 IterTools
 TimeZones

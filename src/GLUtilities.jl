@@ -106,6 +106,7 @@ export
 
     ## Indices stuff
     clip_ndx,
+    clip_ndx_deviance,
     copy_length_check,
     expand_selection,
     t_to_ndx,

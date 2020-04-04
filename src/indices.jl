@@ -107,8 +107,14 @@ end
 
 "Clips an index to be within the valid range for an array of length l"
 function clip_ndx end
-clip_ndx(ind::T, l::T) where T<:Integer = clamp(ind, one(T), l)
-clip_ndx(ind::Integer, l::Integer) = clip_ndx(promote(ind, l)...)
+clip_ndx(ndx::T, l::T) where T<:Integer = clamp(ndx, one(T), l)
+clip_ndx(ndx::Integer, l::Integer) = clip_ndx(promote(ndx, l)...)
+
+"clip_ndx but also return deviance"
+function clip_ndx_deviance(ndx, l)
+    ndxout = clip_ndx(ndx, l)
+    return ndxout, ndxout - ndx
+end
 
 """
     n_ndx(start_idx::T, stop_idx::T) where {T<:Integer}
