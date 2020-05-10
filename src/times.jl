@@ -28,6 +28,10 @@ function isless(a::PreciseDateTime, b::PreciseDateTime)
     a.datetime < b.datetime || (a.datetime == b.datetime && a.nanos < b.nanos)
 end
 
+function ==(a::PreciseDateTime, b::PreciseDateTime)
+    (a.datetime == b.datetime) & (a.nanos == b.nanos)
+end
+
 function n_trailing_zero(number)
     n_digit = 0
     working_number = number
