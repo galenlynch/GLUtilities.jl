@@ -184,6 +184,7 @@ export
     filtermap,
     find_not_unique,
     clipsize!,
+    indices_above_thresh,
 
     ## Mmap stuff
     typemmap,

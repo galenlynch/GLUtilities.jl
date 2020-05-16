@@ -1,6 +1,6 @@
 The GLUtilities.jl package is licensed under the MIT "Expat" License:
 
-> Copyright (c) 2017: galenlynch.
+> Copyright (c) 2017: Galen Lynch.
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
