@@ -778,60 +778,25 @@ function find_first_edge_trigger(arr, thr, comp = >=)
 end
 
 function indices_above_thresh(arr, thr)
-    nel = length(arr)
-    if nel == 0
-        return Matrix{Int}(undef, 2, 0)
-    end
-    rising = find_all_edge_triggers(arr, thr)
-    falling = find_all_edge_triggers(arr, thr, <=)
-    nrise = length(rising)
-    nfall = length(falling)
-    if (nfall == 0) & (nrise == 0)
-        if arr[1] >= thr
-            periods = Matrix{Int}(undef, 2, 1)
-            periods[1] = 1
-            periods[2] = nel
-            return periods
-        else
-            return Matrix{Int}(undef, 2, 0)
-        end
-    end
-    periods = Matrix{Int}(undef, 2, nrise + 1)
-    nout = 0
-    if nrise > 0
-        if nfall > 0
-            if falling[1] < rising[1]
-                nout = 1
-                periods[1, 1] = 1
-                periods[2, 1] = falling[1] - 1
-                closeno = 2
-            else
-                closeno = 1
-            end
-            for openno in 1:nrise
-                if closeno <= nfall
-                    nout += 1
-                    periods[1, nout] = rising[openno]
-                    periods[2, nout] = falling[closeno] - 1
-                    closeno += 1
-                else
-                    nout += 1
-                    periods[1, nout] = rising[openno]
-                    periods[2, nout] = nel
-                    break
-                end
+    out = Vector{UnitRange{Int}}()
+    curr_start = nothing
+    lasti = 0
+    for (i, el) in enumerate(arr)
+        above_thr = el >= thr
+        if curr_start === nothing
+            if above_thr
+                curr_start = i
             end
         else
-            nout = 1
-            periods[1, 1] = rising[1]
-            periods[2, 1] = nel
+            if !above_thr
+                push!(out, curr_start:i-1)
+                curr_start = nothing
+            end
         end
-    else
-        # nfall must be >0
-        nout = 1
-        periods[1, 1] = 1
-        periods[2, 1] = falling[1] - 1
+        lasti = i
     end
-
-    periods[:, 1:nout]
+    if curr_start !== nothing
+        push!(out, curr_start:lasti)
+    end
+    return out
 end
