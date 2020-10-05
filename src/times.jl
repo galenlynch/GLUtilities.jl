@@ -17,7 +17,7 @@ function -(x::PreciseDateTime, y::PreciseDateTime)
         (x.nanos - y.nanos).value * 1e-9
 end
 
-DateTime(pdt::PreciseDateTime) = TimeZones.localtime(pdt.datetime)
+DateTime(pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
 ZonedDateTime(pdt::PreciseDateTime) = pdt.datetime
 
 trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
@@ -51,7 +51,7 @@ end
 const TZ_DATEFMT = DateFormat("zzzz")
 
 function show(io::IO, pdt::PreciseDateTime)
-    dt = TimeZones.localtime(pdt.datetime)
+    dt = DateTime(pdt.datetime, Local)
     print(io, dt)
     millis = convert(Millisecond, dt)
     trailing_millis = millis - convert(Millisecond, floor(millis, Second))
