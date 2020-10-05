@@ -1,7 +1,7 @@
 name = "GLUtilities"
 uuid = "8b4c6747-1f02-570a-a961-a96037df41d6"
 authors = ["Galen Lynch <galen.lynch@gmail.com>"]
-version = "0.2.0"
+version = "0.2.1"
 
 [deps]
 Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
