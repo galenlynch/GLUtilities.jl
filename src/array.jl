@@ -138,24 +138,18 @@ _pairwise_idx(i, j, n) = i - j + div((j - 1) * (2 * (n - 1) - (j - 2)), 2)
 """
 n_el is the number of elements in the INPUT to pairwise diff
 """
-function pairwise_idx(i, j, n)
-    if i == j
-        error("invalid indices")
-    elseif i < j
-        return _pairwise_idx(j, i, n)
-    else
-        return _pairwise_idx(i, j, n)
-    end
+function pairwise_idx(i::T, j::T, n) where T
+    i == j && throw(ArgumentError("invalid indices"))
+    lower, upper = ifelse(i < j, (i, j), (j, i))
+    _pairwise_idx(upper, lower, n)
 end
 
-function map_pairwise(
-    f::Function, a::AbstractVector{T}, ::Type{R} = T
-) where {T, R}
+function map_pairwise(f::F, a::AbstractVector{T}, ::Type{R} = T) where {F, T, R}
     n = length(a)
     out = Vector{R}(undef, convert(Int, n * (n - 1) / 2))
     offset = 0
-    for i = 1:(n-1)
-        @inbounds @simd for j = 1:(n - i)
+    for i in 1 : n - 1
+        @inbounds @simd for j in 1 : n - i
             out[offset + j] = f(a[i + j], a[i])
         end
         offset += n - i
@@ -163,14 +157,12 @@ function map_pairwise(
     out
 end
 
-function map_pairwise(
-    f::Function, as::AbstractVector{T}, bs::AbstractVector, ::Type{R} = T
-) where {T, R}
+function map_pairwise(f::F, as::AbstractVector{T}, bs::AbstractVector, ::Type{R} = T) where {F, T, R}
     na = length(as)
     nb = length(bs)
     out = Matrix{R}(undef, nb, na)
-    @inbounds @simd for i = 1:na
-        for j = 1:nb
+    @inbounds @simd for i in 1:na
+        for j in 1:nb
             out[j, i] = f(as[i], bs[j])
         end
     end
