@@ -1,7 +1,7 @@
 name = "GLUtilities"
 uuid = "8b4c6747-1f02-570a-a961-a96037df41d6"
 authors = ["Galen Lynch <galen.lynch@gmail.com>"]
-version = "0.2.2"
+version = "0.2.3"
 
 [deps]
 Compat = "34da2185-b29b-5c13-b0c7-acf172513d20"
@@ -19,7 +19,7 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
 Compat = "1 - 3"
-Distributions = "0.16 - 0.23"
+Distributions = "0.16 - 0.24"
 IterTools = "0.1 - 1"
 TimeZones = "0.0 - 1"
 julia = "0.5 - 1"
