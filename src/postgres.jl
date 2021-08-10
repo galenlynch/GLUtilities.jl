@@ -103,6 +103,4 @@ function parse_postgres_array(s::AbstractString)
 end
 
 postgres_tuple_list(itr) = '(' * join(imap(string, itr), ',') * ')'
-function postgres_tuple_rows(itr)
-    join(imap(el -> '(' * join(imap(string, el), ',') * ')', itr), ", ")
-end
+postgres_tuple_rows(itr) = join(imap(postgres_tuple_list, itr), ", ")

@@ -295,7 +295,7 @@ function clip_int(input::NTuple{2, <:Number}, bounds::NTuple{2, <:Number})
 end
 
 """
-    join_intervals!(ints::Vector{NTuple{2, <:Number}}, max_gap)
+    join_intervals!(ints::Vector{NTuple{2, <:Number}}, min_gap)
 
 Join a list of sorted intervals, `ints`, if the gap between successive intervals
 is less than `min_gap`. Mutates input in-place
