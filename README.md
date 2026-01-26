@@ -1,7 +1,8 @@
-# GLUtilities
+# GLUtilities [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://galenlynch.github.io/GLUtilities.jl/stable/) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://galenlynch.github.io/GLUtilities.jl/dev/) [![Build Status](https://github.com/galenlynch/GLUtilities.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/galenlynch/GLUtilities.jl/actions/workflows/CI.yml?query=branch%3Amain) [![Coverage](https://codecov.io/gh/galenlynch/GLUtilities.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/galenlynch/GLUtilities.jl) [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
-[![Build Status](https://travis-ci.org/galenlynch/GLUtilities.jl.svg?branch=master)](https://travis-ci.org/galenlynch/GLUtilities.jl)
+A collection of common utilities that my packages depend on, to be factored
+into existing libraries or more focused ones.
 
-[![Coverage Status](https://coveralls.io/repos/galenlynch/GLUtilities.jl/badge.svg?branch=master&service=github)](https://coveralls.io/github/galenlynch/GLUtilities.jl?branch=master)
+## Citing
 
-[![codecov.io](http://codecov.io/github/galenlynch/GLUtilities.jl/coverage.svg?branch=master)](http://codecov.io/github/galenlynch/GLUtilities.jl?branch=master)
+See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
