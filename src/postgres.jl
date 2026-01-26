@@ -8,11 +8,11 @@ const POSTGRES_ARRAY_REG = r"\{([^\}]*)\}"
 postgres_time_str(pdt::PreciseDateTime) = repr(pdt)
 
 function postgres_time_str(dt::ZonedDateTime, micros::Integer = 0)
-    postgres_time_str(add_seconds(dt, micros * 10^-6))
+    return postgres_time_str(add_seconds(dt, micros * 10^-6))
 end
 
 function postgres_time_str(dt::DateTime, micros::Integer = 0, zone = localzone())
-    postgres_time_str(ZonedDateTime(dt, zone), micros)
+    return postgres_time_str(ZonedDateTime(dt, zone), micros)
 end
 
 function PreciseDateTime(datestring::AbstractString)
@@ -32,18 +32,19 @@ function PreciseDateTime(datestring::AbstractString)
     nanos = isempty(micros_match) ?
         0 :
         parse(Int, rpad(micros_match, 3, '0')) * 1000
-    PreciseDateTime(dt, nanos)
+    return PreciseDateTime(dt, nanos)
 end
 
 function postgres_make_tsrange_str(
-    start_dt::ZonedDateTime,
-    start_micros::Integer,
-    stop_dt::ZonedDateTime,
-    stop_micros::Integer;
-    start_bracket::Char = '[',
-    stop_bracket::Char = ')'
-)
-    string(start_bracket, '"', postgres_time_str(start_dt, start_micros), '"',
+        start_dt::ZonedDateTime,
+        start_micros::Integer,
+        stop_dt::ZonedDateTime,
+        stop_micros::Integer;
+        start_bracket::Char = '[',
+        stop_bracket::Char = ')'
+    )
+    return string(
+        start_bracket, '"', postgres_time_str(start_dt, start_micros), '"',
         ',',
         '"', postgres_time_str(stop_dt, stop_micros), '"', stop_bracket
     )
@@ -52,7 +53,7 @@ end
 function postgres_make_tsrange_str(tsr::TSRange)
     start_dt, start_micros = dt_and_micros(tsr.lower.datetime)
     stop_dt, stop_micros = dt_and_micros(tsr.upper.datetime)
-    postgres_make_tsrange_str(
+    return postgres_make_tsrange_str(
         start_dt,
         round(Int, start_micros),
         stop_dt,
@@ -81,7 +82,7 @@ function TSRange(rangestr::AbstractString)
     else
         error("Could not parse stop bound")
     end
-    TSRange(
+    return TSRange(
         RangeBound(start_t, start_inclusive),
         RangeBound(stop_t, stop_inclusive)
     )
@@ -89,9 +90,9 @@ end
 
 function postgres_tsrange_to_datetime_micros(timerange_str::AbstractString)
     tr = TSRange(timerange_str)
-    (
+    return (
         dt_and_micros(tr.lower.datetime)...,
-        dt_and_micros(tr.lower.datetime)...
+        dt_and_micros(tr.lower.datetime)...,
     )
 end
 
@@ -99,7 +100,7 @@ function parse_postgres_array(s::AbstractString)
     m = match(POSTGRES_ARRAY_REG, s)
     m == nothing && return nothing
     content = m[1]
-    strip.(split(content, ',', keepempty = false))
+    return strip.(split(content, ',', keepempty = false))
 end
 
 postgres_tuple_list(itr) = '(' * join(imap(string, itr), ',') * ')'

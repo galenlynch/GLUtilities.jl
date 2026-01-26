@@ -15,5 +15,5 @@ function only_matches(reg::Regex, strs::AbstractArray{<:AbstractString})
         end
     end
     resize!(matches, out_no)
-    matches
+    return matches
 end

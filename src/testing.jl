@@ -1,9 +1,9 @@
 function redirect_io(
-    f::Function,
-    stdout::AbstractString = joinpath(pwd(), "jlout.txt"),
-    stderr::AbstractString = joinpath(pwd(), "jlerr.txt"),
-)
-    open(stdout, "w+") do io
+        f::Function,
+        stdout::AbstractString = joinpath(pwd(), "jlout.txt"),
+        stderr::AbstractString = joinpath(pwd(), "jlerr.txt"),
+    )
+    return open(stdout, "w+") do io
         open(stderr, "w+") do ioe
             redirect_stdout(
                 () -> redirect_stderr(() -> f(), ioe),
@@ -16,7 +16,7 @@ end
 macro redirect_io(ex)
     old_stdout = esc(STDOUT)
     old_stderr = esc(STDERR)
-    quote
+    return quote
         open("jlout.txt", "w+") do io
             io_r = redirect_stdout(io)
             try

@@ -33,7 +33,7 @@ end
         @test t_to_ndx(1, 30000, 0) == 30001
         @test t_to_ndx(1, 30000, 1) == 1
         @test t_to_ndx(1:2, 1, 0) == [2, 3]
-        @test t_to_ndx([1, 2], 1, 0) ==[2, 3]
+        @test t_to_ndx([1, 2], 1, 0) == [2, 3]
 
         @test n_ndx(1, 1) == 1
         @test n_ndx(1, 2) == 2
@@ -124,12 +124,12 @@ end
         B = rand(20)
         C = rand(20)
 
-        cov([A,B,C])
+        cov([A, B, C])
     end
 
     @testset "mmap" begin
         test_len = 5
-        (arr, path) = typemmap(Vector{Int}, (2,); autoclean=true)
+        (arr, path) = typemmap(Vector{Int}, (2,); autoclean = true)
         A = rand(test_len)
         (mma, path) = to_mmap(A)
         @test all(mma .== A)
@@ -145,7 +145,7 @@ end
         @test allsame(1, 1)
         @test ! allsame(1, 2)
         @test allsame(1)
-        @test allsame(length, (1,2), (3, 4))
+        @test allsame(length, (1, 2), (3, 4))
     end
 
     @testset "files" begin

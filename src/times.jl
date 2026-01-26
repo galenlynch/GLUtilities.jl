@@ -13,8 +13,8 @@ PreciseDateTime(dt::DateTime, args...) =
     PreciseDateTime(ZonedDateTime(dt, localzone()), args...)
 
 function -(x::PreciseDateTime, y::PreciseDateTime)
-    Millisecond(x.datetime - y.datetime).value * 1e-3 +
-        (x.nanos - y.nanos).value * 1e-9
+    return Millisecond(x.datetime - y.datetime).value * 1.0e-3 +
+        (x.nanos - y.nanos).value * 1.0e-9
 end
 
 DateTime(pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
@@ -25,11 +25,11 @@ trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
 dt_and_micros(pdt::PreciseDateTime) = (ZonedDateTime(pdt), trailing_micros(pdt))
 
 function isless(a::PreciseDateTime, b::PreciseDateTime)
-    a.datetime < b.datetime || (a.datetime == b.datetime && a.nanos < b.nanos)
+    return a.datetime < b.datetime || (a.datetime == b.datetime && a.nanos < b.nanos)
 end
 
 function ==(a::PreciseDateTime, b::PreciseDateTime)
-    (a.datetime == b.datetime) & (a.nanos == b.nanos)
+    return (a.datetime == b.datetime) & (a.nanos == b.nanos)
 end
 
 function n_trailing_zero(number)
@@ -45,7 +45,7 @@ end
 
 function clip_trailing(number)
     n_trail = n_trailing_zero(number)
-    div(number, 10 ^ n_trail)
+    return div(number, 10^n_trail)
 end
 
 const TZ_DATEFMT = DateFormat("zzzz")
@@ -67,7 +67,7 @@ function show(io::IO, pdt::PreciseDateTime)
         clipped_nano_str = SubString(nano_str, 1, last_nonzero)
     end
     print(io, clipped_nano_str)
-    print(io, Dates.format(pdt.datetime, TZ_DATEFMT))
+    return print(io, Dates.format(pdt.datetime, TZ_DATEFMT))
 end
 
 show(io::IO, ::MIME"text/plain", pdt::PreciseDateTime) =
@@ -78,7 +78,7 @@ function +(pdt::PreciseDateTime, ns::Nanosecond)
     sum_millis = floor(sum_nanos, Millisecond)
     trailing_nanos = sum_nanos - convert(Nanosecond, sum_millis)
     new_zdt = pdt.datetime + sum_millis
-    PreciseDateTime(new_zdt, trailing_nanos)
+    return PreciseDateTime(new_zdt, trailing_nanos)
 end
 
 +(pdt::PreciseDateTime, p::TimePeriod) = pdt + convert(Nanosecond, p)
@@ -90,14 +90,14 @@ add_seconds(dt::Dates.AbstractDateTime, sec::Real) = add_nanos(dt, sec * 10^9)
 
 function duration(start::PreciseDateTime, stop::PreciseDateTime)
     ns_diff = Dates.Nanosecond(stop.date - start.date) + (stop.time - start.time)
-    ns_diff.value / 10^9
+    return ns_diff.value / 10^9
 end
 
 function duration(
-    tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
-)
+        tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
+    )
     micro_diff = Dates.Microsecond(tend - tstart).value + (microend - microstart)
-    micro_diff / 10^6
+    return micro_diff / 10^6
 end
 
 struct RangeBound
@@ -105,7 +105,7 @@ struct RangeBound
     inclusive::Bool
 end
 function RangeBound(dt::DateTime, micros::Integer = 0, inclusive::Bool = true)
-    RangeBound(PrecsieDateTime(dt, micros), inclusive)
+    return RangeBound(PrecsieDateTime(dt, micros), inclusive)
 end
 
 struct TSRange
@@ -115,12 +115,12 @@ struct TSRange
         if lower.datetime > upper.datetime
             throw(ArgumentError("Bounds are not well ordered"))
         end
-        new(lower, upper)
+        return new(lower, upper)
     end
 end
 
 function TSRange(lower::PreciseDateTime, upper::PreciseDateTime)
-    TSRange(RangeBound(lower, true), RangeBound(upper, true))
+    return TSRange(RangeBound(lower, true), RangeBound(upper, true))
 end
 
 function show(io::IO, r::TSRange)
@@ -131,14 +131,14 @@ function show(io::IO, r::TSRange)
     print(ioc, r.lower.datetime)
     print(io, ',')
     print(ioc, r.upper.datetime)
-    print(io, rb)
+    return print(io, rb)
 end
 
 show(io::IO, ::MIME"text/plain", r::TSRange) =
     print(io, "TSRange time stamp range:\n    ", r)
 
 function check_overlap(a::TSRange, b::TSRange)
-    check_overlap(
+    return check_overlap(
         a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime
     )
 end
