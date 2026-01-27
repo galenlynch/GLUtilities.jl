@@ -21,7 +21,7 @@ end
 
 function to_mmap(a::AbstractArray, arrtype::DataType = typeof(a); kwargs...)
     mma, path = typemmap(arrtype, size(a); kwargs...)
-    @compat copyto!(mma, a)
+    copyto!(mma, a)
     mma, path
 end
 

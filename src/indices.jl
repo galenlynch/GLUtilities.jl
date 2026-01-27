@@ -38,13 +38,13 @@ function ndx_to_t(
     fs::R,
     start_t::R = zero(fs)
 ) where {R<:Integer}
-    @compat ts = Vector{Float64}(undef, length(A))
+    ts = Vector{Float64}(undef, length(A))
     ndx_to_t!(ts, A, fs, start_t)
 end
 function ndx_to_t(
     A::AbstractArray{R, <:Any}, fs::R, start_t::R = zero(fs)
 ) where {R<:AbstractFloat}
-    @compat ts = Vector{R}(undef, length(A))
+    ts = Vector{R}(undef, length(A))
     ndx_to_t!(ts, A, fs, start_t)
 end
 function ndx_to_t(
@@ -212,7 +212,7 @@ end
 function view_trailing_slice_impl(
     a::Type{<:AbstractArray{<:Any, N}}
 ) where {N}
-    @compat exprargs = Vector{Any}(undef, N + 2)
+    exprargs = Vector{Any}(undef, N + 2)
     exprargs[1] = :view
     exprargs[2] = :a
     exprargs[3:end - 1] .= Ref(:(Colon()))
@@ -223,14 +223,14 @@ end
 function make_slice_idx(
     ndims::Integer, dimno::Integer, idx::T
 ) where {T<:Union{Integer, OrdinalRange{<:Integer,<:Any}}}
-    @compat idxes = Array{Union{Colon, T}}(undef, ndims)
+    idxes = Array{Union{Colon, T}}(undef, ndims)
     idxes .= Colon()
     idxes[dimno] = idx
     return (idxes...,)
 end
 
 function make_expand_idx(ndims::Integer, dimno::Integer)
-    @compat idxes = Array{Union{Colon, Int}}(undef, ndims)
+    idxes = Array{Union{Colon, Int}}(undef, ndims)
     idxes[:] .= 1
     idxes[dimno] = Colon()
     return (idxes...,)

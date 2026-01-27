@@ -57,7 +57,7 @@ end
 
 function local_extrema(s::AbstractVector, comp::Function = >)
     ns = length(s)
-    @compat idxes = Vector{Int}(undef, div(ns, 2))
+    idxes = Vector{Int}(undef, div(ns, 2))
     out_i = 0
     if ns > 2
         @inbounds last_comp = comp(s[1], s[2])
@@ -80,8 +80,8 @@ function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
     S = div_type(T)
     cov = zeros(S, na, na)
     if na > 0
-        @compat means = Vector{S}(undef, na)
-        @compat scratch = Vector{S}(undef, na)
+        means = Vector{S}(undef, na)
+        scratch = Vector{S}(undef, na)
         @inbounds for (i, a) in enumerate(as)
             means[i] = mean(a)
         end
@@ -189,7 +189,7 @@ function find_subseq(subseq, seq)
     nseq = length(seq)
     nsub > nseq && return Vector{Int}()
     max_idx = nseq - nsub + 1
-    @compat imatch = Vector{Int}(undef, max_idx)
+    imatch = Vector{Int}(undef, max_idx)
     nmatch = 0
     idx = 1
     while (idx = findnext(p, seq, idx)) != nothing

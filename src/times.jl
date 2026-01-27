@@ -17,7 +17,7 @@ function -(x::PreciseDateTime, y::PreciseDateTime)
         (x.nanos - y.nanos).value * 1e-9
 end
 
-DateTime(pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
+convert(::Type{DateTime}, pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
 ZonedDateTime(pdt::PreciseDateTime) = pdt.datetime
 
 trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
