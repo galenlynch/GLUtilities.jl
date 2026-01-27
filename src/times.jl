@@ -101,7 +101,7 @@ struct RangeBound
     inclusive::Bool
 end
 function RangeBound(dt::DateTime, micros::Integer = 0, inclusive::Bool = true)
-    RangeBound(PrecsieDateTime(dt, micros), inclusive)
+    RangeBound(PreciseDateTime(dt, micros), inclusive)
 end
 
 struct TSRange

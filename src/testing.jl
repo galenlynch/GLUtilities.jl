@@ -11,8 +11,8 @@ function redirect_io(
 end
 
 macro redirect_io(ex)
-    old_stdout = esc(STDOUT)
-    old_stderr = esc(STDERR)
+    old_stdout = esc(stdout)
+    old_stderr = esc(stderr)
     quote
         open("jlout.txt", "w+") do io
             io_r = redirect_stdout(io)

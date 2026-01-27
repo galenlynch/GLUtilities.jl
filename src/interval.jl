@@ -12,7 +12,7 @@ function is_subinterval(tupa::NTuple{2,<:Number}, tupb::NTuple{2,<:Number})
     is_subinterval(tupa[1], tupa[2], tupb[1], tupb[2])
 end
 
-function check_overlap(a::AbstractVector{<:NTuple{2,<:Any}})
+function check_overlap(a::AbstractVector{<:NTuple{2}})
     na = length(a)
     for i = 1:na, j = (i+1):na
         if check_overlap(a[i][1], a[i][2], a[j][1], a[j][2])
@@ -76,7 +76,7 @@ end
 
 interval_intersect(b1, e1, b2, e2) = interval_intersect(promote(b1, e1, b2, e2)...)
 
-function interval_intersect(a::NTuple{2,<:Any}, b::NTuple{2,<:Any})
+function interval_intersect(a::NTuple{2}, b::NTuple{2})
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
@@ -91,7 +91,7 @@ end
 interval_intersect_measure(b1, e1, b2, e2) =
     interval_intersect_measure(promote(b1, e1, b2, e2)...)
 
-function interval_intersect_measure(a::NTuple{2,<:Any}, b::NTuple{2,<:Any})
+function interval_intersect_measure(a::NTuple{2}, b::NTuple{2})
     interval_intersect_measure(a[1], a[2], b[1], b[2])
 end
 
@@ -105,12 +105,12 @@ Returns a boolean.
 """
 function _intervals_are_ordered(f, crit, ints)
     iter_result = iterate(ints)
-    iter_result == nothing && return true
+    isnothing(iter_result) && return true
     element, state = iter_result
     prev_start, prev_end = f(element)
     ok = prev_start <= prev_end
     iter_result = iterate(ints, state)
-    while ok & (iter_result != nothing)
+    while ok & !isnothing(iter_result)
         (element, state) = iter_result
         a, b = f(element)
         ok &= a <= b
@@ -234,10 +234,10 @@ function interval_intersections_overlapping(intsa, intsb)
     outs
 end
 
-measure(a::NTuple{2,<:Number}) = a[2] - a[1]
-measure(::Nothing) = 0
+@inline measure(a::NTuple{2,<:Number}) = a[2] - a[1]
+@inline measure(::Nothing) = 0
 
-midpoint(a::NTuple{2,<:Number}) = (a[1] + a[2]) / 2
+@inline midpoint(a::NTuple{2,<:Number}) = (a[1] + a[2]) / 2
 
 function reduce_extrema(s1::T, s2::T, t1::T, t2::T) where {T<:Number}
     return (min(s1, t1), max(s2, t2))
@@ -524,8 +524,8 @@ function parse_ranges_str(s::AbstractString)
 end
 
 measure_to_bounds(a::Number, b::Number) = (a, a + b)
-measure_to_bounds(t::NTuple{2,<:Any}) = measure_to_bounds(t[1], t[2])
-measure_to_bounds(ts::AbstractArray{<:NTuple{2,<:Any}}) = measure_to_bounds.(ts)
+measure_to_bounds(t::NTuple{2}) = measure_to_bounds(t[1], t[2])
+measure_to_bounds(ts::AbstractArray{<:NTuple{2}}) = measure_to_bounds.(ts)
 measure_to_bounds(a::AbstractArray, b::AbstractArray) = measure_to_bounds.(a, b)
 
 "Clip an interval while trying to maintain its duration"
@@ -549,11 +549,11 @@ end
 clip_interval_duration(a, b, c, d) = clip_interval_duration(promote(a, b, c, d)...)
 clip_interval_duration(reqb::Number, reqe, boundmax) =
     clip_interval_duration(reqb, reqe, 0, boundmax)
-clip_interval_duration(int::NTuple{2,<:Any}, intb::NTuple{2,<:Any}) =
+clip_interval_duration(int::NTuple{2}, intb::NTuple{2}) =
     clip_interval_duration(int..., intb...)
-clip_interval_duration(int::NTuple{2,<:Any}, boundmin, boundmax) =
+clip_interval_duration(int::NTuple{2}, boundmin, boundmax) =
     clip_interval_duration(int[1], int[2], boundmax)
-clip_exampl_interval(int::NTuple{2,<:Any}, boundmax::Number) =
+clip_exampl_interval(int::NTuple{2}, boundmax::Number) =
     clip_interval_duration(int, 0, boundmax)
 
 function maximum_interval_overlap(xs::AbstractVector{NTuple{2,T}}, y::NTuple{2,T}) where {T}

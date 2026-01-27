@@ -11,7 +11,15 @@ function typemmap(
     arr = open(fpath, ifelse(readonly, "r+", "w+")) do io
         Mmap.mmap(io, A, dims; grow = true)
     end
-    autoclean && atexit(()->rm(fpath))
+    if autoclean
+        finalizer(arr) do a
+            try
+                rm(fpath; force = true)
+            catch
+                # File might already be deleted or locked, that's ok
+            end
+        end
+    end
     arr, fpath
 end
 

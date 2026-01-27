@@ -17,7 +17,7 @@ end
 
 function PreciseDateTime(datestring::AbstractString)
     m = match(PSQL_DATETIME_REG, datestring)
-    m == nothing && throw(ArgumentError("Could not parse $datestring"))
+    isnothing(m) && throw(ArgumentError("Could not parse $datestring"))
     millis_match = something(m[2], "")
     micros_match = something(m[3], "")
     if isnothing(m[4])
@@ -68,7 +68,7 @@ end
 
 function TSRange(rangestr::AbstractString)
     m = match(PSQL_RANGE_REG, rangestr)
-    m == nothing && error("Could not parse ", s, " as TSRange")
+    isnothing(m) && error("Could not parse ", s, " as TSRange")
     if m[1] == "["
         start_inclusive = true
     elseif m[1] == "("
@@ -95,7 +95,7 @@ end
 
 function parse_postgres_array(s::AbstractString)
     m = match(POSTGRES_ARRAY_REG, s)
-    m == nothing && return nothing
+    isnothing(m) && return nothing
     content = m[1]
     strip.(split(content, ',', keepempty = false))
 end

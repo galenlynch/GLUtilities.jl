@@ -39,7 +39,7 @@ function weighted_mean(
     summand::AbstractArray{E,N},
     weights::AbstractArray{T,N},
     total_weight::T = sum(weights),
-) where {G<:Number,E<:AbstractArray{G,<:Any},N,T<:Number}
+) where {G<:Number,E<:AbstractArray{G},N,T<:Number}
     # assumes elements of summand have the same size
     if size(summand) != size(weights)
         throw(ArgumentError("Sizes are not the same"))
@@ -63,7 +63,7 @@ function local_extrema(s::AbstractVector, comp::Function = >)
         @inbounds last_comp = comp(s[1], s[2])
         for i = 2:(ns-1)
             @inbounds this_comp = comp(s[i], s[i+1])
-            if this_comp && ! last_comp
+            if this_comp && !last_comp
                 out_i += 1
                 @inbounds idxes[out_i] = i
             end
@@ -114,7 +114,7 @@ subtraction of ordered lists.
 # Examples
 ```julia-repl
 julia> pairwise_idxs(3)
-3-element Array{Tuple{Int64,Int64},1}:
+3-element Vector{Tuple{Int64,Int64}}:
  (2, 1)
  (3, 1)
  (3, 2)
@@ -194,7 +194,7 @@ function find_subseq(subseq, seq)
     imatch = Vector{Int}(undef, max_idx)
     nmatch = 0
     idx = 1
-    while (idx = findnext(p, seq, idx)) != nothing
+    while !isnothing(idx = findnext(p, seq, idx))
         idx > max_idx && break
         ismatch = true
         @inbounds for i = 2:nsub
@@ -215,7 +215,7 @@ end
 
 function subselect(
     base_vec,
-    idx_tup_vec::AbstractVector{<:NTuple{2,<:Any}},
+    idx_tup_vec::AbstractVector{<:NTuple{2}},
     outtype::Type{T} = ifelse(
         base_vec isa AbstractVector,
         typeof(base_vec),
@@ -233,7 +233,7 @@ end
 
 function subselect(
     base_vec,
-    idx_tup_vec::AbstractVector{<:NTuple{2,<:Any}},
+    idx_tup_vec::AbstractVector{<:NTuple{2}},
     outtype::Type{T},
 ) where {T<:SharedVector}
     nout = length(idx_tup_vec)
@@ -308,22 +308,22 @@ end
 mad_quantiles(a) = mad_quantiles!(similar(a, Float32), a)
 
 """
-    skipnothing(itr)
-Return an iterator over the elements in `itr` skipping [`nothing`](@ref) values.
-Use [`collect`](@ref) to obtain an `Array` containing the non-`nothing` values in
+    skipoftype(::Type{T}, itr)
+Return an iterator over the elements in `itr` skipping values of type `T`.
+Use `collect` to obtain an `Array` containing the non-`T` values in
 `itr`. Note that even if `itr` is a multidimensional array, the result will always
 be a `Vector` since it is not possible to remove nothings while preserving dimensions
 of the input.
 # Examples
 ```jldoctest
-julia> sum(skipnothing([1, nothing, 2]))
+julia> sum(GLUtilities.skipoftype(nothing, [1, nothing, 2]))
 3
-julia> collect(skipnothing([1, nothing, 2]))
-2-element Array{Int64,1}:
+julia> collect(GLUtilities.skipoftype(nothing, [1, nothing, 2]))
+2-element Vector{Int64}:
  1
  2
-julia> collect(skipnothing([1 nothing; 2 nothing]))
-2-element Array{Int64,1}:
+julia> collect(GLUtilities.skipoftype(nothing, [1 nothing; 2 nothing]))
+2-element Vector{Int64}:
  1
  2
 ```
@@ -339,13 +339,13 @@ IteratorSize(::Type{<:SkipOfType}) = SizeUnknown()
 IteratorEltype(::Type{SkipOfType{T,A}}) where {T,A} = IteratorEltype(A)
 eltype(::Type{SkipOfType{T,A}}) where {T,A} = union_poptype(T, eltype(A))
 
-function iterate(itr::SkipOfType{T,<:Any}, state...) where {T}
+function iterate(itr::SkipOfType{T}, state...) where {T}
     y = iterate(itr.x, state...)
-    y === nothing && return nothing
+    isnothing(y) && return nothing
     item, state = y
     while item isa T
         y = iterate(itr.x, state)
-        y === nothing && return nothing
+        isnothing(y) && return nothing
         item, state = y
     end
     item, state
@@ -437,11 +437,11 @@ mapreduce_impl(f, op, A::SkipOfType, ifirst::Integer, ilast::Integer) =
         imid = (ifirst + ilast) >> 1
         v1 = mapreduce_impl(f, op, itr, ifirst, imid, blksize)
         v2 = mapreduce_impl(f, op, itr, imid+1, ilast, blksize)
-        if v1 === nothing && v2 === nothing
+        if isnothing(v1) && isnothing(v2)
             return nothing
-        elseif v1 === nothing
+        elseif isnothing(v1)
             return v2
-        elseif v2 === nothing
+        elseif isnothing(v2)
             return v1
         else
             return Some(op(something(v1), something(v2)))
@@ -522,7 +522,7 @@ function thresh_cross(arr, thresh, comp = <)
     idx_cross = Vector{Int}(undef, div(l, 2))
     out_no = 0
     for i = 1:(l-1)
-        if comp(arr[i], thresh) & (! comp(arr[i+1], thresh))
+        if comp(arr[i], thresh) & (!comp(arr[i+1], thresh))
             out_no += 1
             idx_cross[out_no] = i + 1
         end
@@ -586,7 +586,7 @@ function find_local_extrema(
     bias = ifelse(right_on_ties, 1, -1)
     if ismissing(sig[start_ndx]) || isnan(sig[start_ndx])
         newstart = findfirst(x -> !(ismissing(x) | isnan(x)), sig)
-        newstart == nothing && error("None valid")
+        isnothing(newstart) && error("None valid")
     end
     search_ndx = start_ndx
     iterno = 0
@@ -719,7 +719,7 @@ function find_not_unique(a::AbstractArray{T}) where {T}
     for (i, el) in enumerate(a)
         if haskey(seen_els, el)
             (first_ndx, duplicated) = seen_els[el]
-            if ! duplicated
+            if !duplicated
                 seen_els[el] = (first_ndx, true)
                 outno += 1
                 redundant_ndxs[outno] = first_ndx
@@ -779,7 +779,7 @@ function indices_above_thresh(arr, thr)
     lasti = 0
     for (i, el) in enumerate(arr)
         above_thr = el >= thr
-        if curr_start === nothing
+        if isnothing(curr_start)
             if above_thr
                 curr_start = i
             end
@@ -791,7 +791,7 @@ function indices_above_thresh(arr, thr)
         end
         lasti = i
     end
-    if curr_start !== nothing
+    if !isnothing(curr_start)
         push!(out, curr_start:lasti)
     end
     return out

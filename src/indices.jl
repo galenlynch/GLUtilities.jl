@@ -5,18 +5,10 @@ Converts an index to its time in a regularly sampled time series.
 """
 function ndx_to_t end
 function ndx_to_t(i::AbstractUnitRange, fs::R, start_t::R = zero(fs)) where {R<:Real}
-    @static if VERSION < v"0.7.0-DEV.2005"
-        (i - 1) / fs + start_t
-    else
-        (i .- 1) ./ fs .+ start_t
-    end
+    (i .- 1) ./ fs .+ start_t
 end
 function ndx_to_t(i::AbstractUnitRange, fs::R, start_t::R = zero(fs)) where {R<:Integer}
-    @static if VERSION < v"0.7.0-DEV.2005"
-        (i - 1) / fs + start_t
-    else
-        (i .- 1) ./ fs .+ start_t
-    end
+    (i .- 1) ./ fs .+ start_t
 end
 function ndx_to_t(i::Real, fs::R, start_t::R = zero(fs)) where {R<:Real}
     (i - 1) / fs + start_t
@@ -29,14 +21,14 @@ function ndx_to_t(A::AbstractArray, fs::R, start_t::R = zero(fs)) where {R<:Inte
     ndx_to_t!(ts, A, fs, start_t)
 end
 function ndx_to_t(
-    A::AbstractArray{R,<:Any},
+    A::AbstractArray{R},
     fs::R,
     start_t::R = zero(fs),
 ) where {R<:AbstractFloat}
     ts = Vector{R}(undef, length(A))
     ndx_to_t!(ts, A, fs, start_t)
 end
-function ndx_to_t(a::AbstractArray{T,<:Any}, fs::R, start_t::S) where {T,R<:Real,S<:Real}
+function ndx_to_t(a::AbstractArray{T}, fs::R, start_t::S) where {T,R<:Real,S<:Real}
     P = promote_type(T, R, S)
     promoted = convert.(P, (fs, start_t))
     return ndx_to_t(a, promoted...)
@@ -90,8 +82,8 @@ end
 
 "Clips an index to be within the valid range for an array of length l"
 function clip_ndx end
-clip_ndx(ndx::T, l::T) where {T<:Integer} = clamp(ndx, one(T), l)
-clip_ndx(ndx::Integer, l::Integer) = clip_ndx(promote(ndx, l)...)
+@inline clip_ndx(ndx::T, l::T) where {T<:Integer} = clamp(ndx, one(T), l)
+@inline clip_ndx(ndx::Integer, l::Integer) = clip_ndx(promote(ndx, l)...)
 
 "clip_ndx but also return deviance"
 function clip_ndx_deviance(ndx, l)
@@ -126,7 +118,7 @@ and the index required to return npt number of elements is returned.
 """
 function ndx_offset(start_ndx::T, npt::T) where {T<:Integer}
     adjust = ifelse(npt < zero(T), one(T), -one(T))
-    return start_ndx + npt + adjust;
+    return start_ndx + npt + adjust
 end
 
 duration(npoints::Integer, fs::Real) = (npoints - 1) / fs
@@ -150,13 +142,8 @@ function bin_bounds(
     binsize::S,
 ) where {T<:Integer,S<:Integer}
     R = promote_type(T, S)
-    @static if VERSION < v"0.7.0-DEV.2005"
-        idx_start = (binno - one(R)) * binsize + one(R)
-        idx_stop = idx_start + binsize - one(R)
-    else
-        idx_start = (binno .- one(R)) .* binsize .+ one(R)
-        idx_stop = idx_start .+ binsize .- one(R)
-    end
+    idx_start = (binno .- one(R)) .* binsize .+ one(R)
+    idx_stop = idx_start .+ binsize .- one(R)
     return (idx_start, idx_stop)
 end
 function bin_bounds(binno::Real, binsize::Real, max_ndx::Real)
@@ -172,16 +159,16 @@ bin_center(i::Real, args...) = bin_center(bin_bounds(i, args...))
 bin_center(rs::NTuple{2,R}) where {R<:AbstractRange} = (rs[1] + rs[2]) / 2
 bin_center(r::AbstractRange, binsize::Real) = bin_center(bin_bounds(r, binsize))
 function bin_center!(
-    dest::AbstractArray{<:AbstractFloat,<:Any},
+    dest::AbstractArray{<:AbstractFloat},
     a::AbstractArray{<:NTuple{2,<:Real}},
 )
     dest .= bin_center.(a)
 end
-function bin_center(a::AbstractArray{<:NTuple{2,F},<:Any}) where {F<:AbstractFloat}
+function bin_center(a::AbstractArray{<:NTuple{2,F}}) where {F<:AbstractFloat}
     dest = similar(a, F)
     bin_center!(dest, a)
 end
-function bin_center(a::AbstractArray{<:NTuple{2,<:Integer},<:Any})
+function bin_center(a::AbstractArray{<:NTuple{2,<:Integer}})
     dest = similar(a, Float64)
     bin_center!(dest, a)
 end
@@ -189,7 +176,7 @@ end
 @generated function view_trailing_slice(
     a::AbstractArray{<:Any,N},
     idx::T,
-) where {N,T<:Union{Integer,OrdinalRange{<:Integer,<:Any}}}
+) where {N,T<:Union{Integer,OrdinalRange{<:Integer}}}
     view_trailing_slice_impl(a)
 end
 
@@ -206,7 +193,7 @@ function make_slice_idx(
     ndims::Integer,
     dimno::Integer,
     idx::T,
-) where {T<:Union{Integer,OrdinalRange{<:Integer,<:Any}}}
+) where {T<:Union{Integer,OrdinalRange{<:Integer}}}
     idxes = Array{Union{Colon,T}}(undef, ndims)
     idxes .= Colon()
     idxes[dimno] = idx

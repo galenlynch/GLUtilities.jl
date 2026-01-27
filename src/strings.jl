@@ -9,7 +9,7 @@ function only_matches(reg::Regex, strs::AbstractArray{<:AbstractString})
     out_no = 0
     for str in strs
         maybe_match = match(reg, str)
-        if maybe_match != nothing
+        if !isnothing(maybe_match)
             out_no += 1
             matches[out_no] = maybe_match
         end

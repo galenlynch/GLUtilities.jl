@@ -14,7 +14,15 @@ using SharedArrays: SharedVector
 
 using Printf
 
-using Dates: AbstractDateTime, DateTime, DateFormat, Nanosecond, Microsecond, Millisecond, TimePeriod, @dateformat_str
+using Dates:
+    AbstractDateTime,
+    DateTime,
+    DateFormat,
+    Nanosecond,
+    Microsecond,
+    Millisecond,
+    TimePeriod,
+    @dateformat_str
 
 using LinearAlgebra: UpperTriangular
 
