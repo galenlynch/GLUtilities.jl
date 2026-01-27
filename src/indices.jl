@@ -169,8 +169,8 @@ end
 function bin_center end
 bin_center(idxs::NTuple{2,<:Real}) = mean(idxs)
 bin_center(i::Real, args...) = bin_center(bin_bounds(i, args...))
-bin_center(rs::NTuple{2,R}) where {R<:Compat.AbstractRange} = (rs[1] + rs[2]) / 2
-bin_center(r::Compat.AbstractRange, binsize::Real) = bin_center(bin_bounds(r, binsize))
+bin_center(rs::NTuple{2,R}) where {R<:AbstractRange} = (rs[1] + rs[2]) / 2
+bin_center(r::AbstractRange, binsize::Real) = bin_center(bin_bounds(r, binsize))
 function bin_center!(
     dest::AbstractArray{<:AbstractFloat,<:Any},
     a::AbstractArray{<:NTuple{2,<:Real}},

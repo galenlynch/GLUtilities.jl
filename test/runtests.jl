@@ -1,10 +1,4 @@
-using Compat, GLUtilities
-
-@static if VERSION >= v"0.7.0-DEV.2575"
-    using Dates, LinearAlgebra, Compat, Statistics, Test, Mmap
-else
-    using Base.Test
-end
+using GLUtilities, Dates, LinearAlgebra, Statistics, Test, Mmap
 
 @testset "GLUtilities" begin
     @testset "types" begin

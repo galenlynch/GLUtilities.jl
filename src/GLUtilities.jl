@@ -1,6 +1,6 @@
 module GLUtilities
 
-using Compat, Distributions
+using Distributions
 
 using Base: @propagate_inbounds
 
@@ -10,9 +10,15 @@ using TimeZones
 
 using TimeZones: Local
 
+using SharedArrays: SharedVector
+
 using Printf
 
-import Dates: AbstractDateTime, DateTime
+using Dates: AbstractDateTime, DateTime, DateFormat, Nanosecond, Microsecond, Millisecond, TimePeriod, @dateformat_str
+
+using LinearAlgebra: UpperTriangular
+
+using Mmap: Mmap
 
 import TimeZones: ZonedDateTime
 
