@@ -1,7 +1,7 @@
 const FILE_DATEFORMAT = DateFormat("yyyy-mm-ddTHH-MM-SS")
 const JULIA_DT_REG = r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"
 
-struct PreciseDateTime <: Dates.AbstractDateTime
+struct PreciseDateTime <: AbstractDateTime
     datetime::ZonedDateTime
     nanos::Nanosecond
 end
@@ -13,11 +13,10 @@ PreciseDateTime(dt::DateTime, args...) =
     PreciseDateTime(ZonedDateTime(dt, localzone()), args...)
 
 function -(x::PreciseDateTime, y::PreciseDateTime)
-    Millisecond(x.datetime - y.datetime).value * 1e-3 +
-        (x.nanos - y.nanos).value * 1e-9
+    Millisecond(x.datetime - y.datetime).value * 1e-3 + (x.nanos - y.nanos).value * 1e-9
 end
 
-DateTime(pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
+convert(::Type{DateTime}, pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
 ZonedDateTime(pdt::PreciseDateTime) = pdt.datetime
 
 trailing_micros(pdt::PreciseDateTime) = pdt.nanos.value / 10^3
@@ -67,7 +66,7 @@ function show(io::IO, pdt::PreciseDateTime)
         clipped_nano_str = SubString(nano_str, 1, last_nonzero)
     end
     print(io, clipped_nano_str)
-    print(io, Dates.format(pdt.datetime, TZ_DATEFMT))
+    print(io, format(pdt.datetime, TZ_DATEFMT))
 end
 
 show(io::IO, ::MIME"text/plain", pdt::PreciseDateTime) =
@@ -84,19 +83,16 @@ end
 +(pdt::PreciseDateTime, p::TimePeriod) = pdt + convert(Nanosecond, p)
 
 add_nanos(pdt::PreciseDateTime, ns::Real) = pdt + Nanosecond(round(Int, ns))
-add_nanos(dt::Dates.AbstractDateTime, nanos::Real) =
-    add_nanos(PreciseDateTime(dt), nanos)
-add_seconds(dt::Dates.AbstractDateTime, sec::Real) = add_nanos(dt, sec * 10^9)
+add_nanos(dt::AbstractDateTime, nanos::Real) = add_nanos(PreciseDateTime(dt), nanos)
+add_seconds(dt::AbstractDateTime, sec::Real) = add_nanos(dt, sec * 10^9)
 
 function duration(start::PreciseDateTime, stop::PreciseDateTime)
-    ns_diff = Dates.Nanosecond(stop.date - start.date) + (stop.time - start.time)
+    ns_diff = Nanosecond(stop.date - start.date) + (stop.time - start.time)
     ns_diff.value / 10^9
 end
 
-function duration(
-    tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
-)
-    micro_diff = Dates.Microsecond(tend - tstart).value + (microend - microstart)
+function duration(tstart::DateTime, microstart::Real, tend::DateTime, microend::Real)
+    micro_diff = Microsecond(tend - tstart).value + (microend - microstart)
     micro_diff / 10^6
 end
 
@@ -105,7 +101,7 @@ struct RangeBound
     inclusive::Bool
 end
 function RangeBound(dt::DateTime, micros::Integer = 0, inclusive::Bool = true)
-    RangeBound(PrecsieDateTime(dt, micros), inclusive)
+    RangeBound(PreciseDateTime(dt, micros), inclusive)
 end
 
 struct TSRange
@@ -138,9 +134,7 @@ show(io::IO, ::MIME"text/plain", r::TSRange) =
     print(io, "TSRange time stamp range:\n    ", r)
 
 function check_overlap(a::TSRange, b::TSRange)
-    check_overlap(
-        a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime
-    )
+    check_overlap(a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime)
 end
 
 duration(a::TSRange) = a.upper.datetime - a.lower.datetime # seconds

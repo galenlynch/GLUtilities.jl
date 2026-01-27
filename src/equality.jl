@@ -19,5 +19,5 @@ end
 
 anyeq(el, iter) = any(a -> a == el, iter)
 
-absdiff(a::Unsigned, b::Unsigned) = ifelse(a <= b, b - a, a - b)
-absdiff(a::Signed, b::Signed) = abs(a - b)
+@inline absdiff(a::Unsigned, b::Unsigned) = ifelse(a <= b, b - a, a - b)
+@inline absdiff(a::Signed, b::Signed) = abs(a - b)

@@ -5,17 +5,14 @@ function redirect_io(
 )
     open(stdout, "w+") do io
         open(stderr, "w+") do ioe
-            redirect_stdout(
-                () -> redirect_stderr(() -> f(), ioe),
-                io
-            )
+            redirect_stdout(() -> redirect_stderr(() -> f(), ioe), io)
         end
     end
 end
 
 macro redirect_io(ex)
-    old_stdout = esc(STDOUT)
-    old_stderr = esc(STDERR)
+    old_stdout = esc(stdout)
+    old_stderr = esc(stderr)
     quote
         open("jlout.txt", "w+") do io
             io_r = redirect_stdout(io)

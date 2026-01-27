@@ -1,12 +1,6 @@
-using Compat, GLUtilities
+using GLUtilities, Dates, LinearAlgebra, Statistics, Test, Mmap
 
-@static if VERSION >= v"0.7.0-DEV.2575"
-    using Dates, LinearAlgebra, Compat, Statistics, Test, Mmap
-else
-    using Base.Test
-end
-
-@testset "GLUtilities"  begin
+@testset "GLUtilities" begin
     @testset "types" begin
         @test div_type(Int) == Float64
         @test div_type(Int, Int) == Float64
@@ -33,7 +27,7 @@ end
         @test t_to_ndx(1, 30000, 0) == 30001
         @test t_to_ndx(1, 30000, 1) == 1
         @test t_to_ndx(1:2, 1, 0) == [2, 3]
-        @test t_to_ndx([1, 2], 1, 0) ==[2, 3]
+        @test t_to_ndx([1, 2], 1, 0) == [2, 3]
 
         @test n_ndx(1, 1) == 1
         @test n_ndx(1, 2) == 2
@@ -66,21 +60,22 @@ end
         @test ! copy_length_check(1, 5)
         @test copy_length_check(rand(5), rand(1))
         @test ! copy_length_check(rand(1), rand(5))
-        GLUtilities.view_trailing_slice_impl(Array{Int, 2})
+        GLUtilities.view_trailing_slice_impl(Array{Int,2})
     end
 
     @testset "times" begin
-        @test add_seconds(DateTime(2013, 7, 1), 1) == PreciseDateTime(DateTime(2013, 7, 1, 0, 0, 1))
+        @test add_seconds(DateTime(2013, 7, 1), 1) ==
+              PreciseDateTime(DateTime(2013, 7, 1, 0, 0, 1))
 
         @test duration(
             DateTime(2013, 7, 1, 0, 0, 0),
             0,
             DateTime(2013, 7, 1, 0, 0, 1),
-            0
+            0,
         ) == 1
 
         @test datevec_to_precisedatetime(Float64[2017, 05, 14, 13, 53, 22.222]) ==
-            PreciseDateTime(DateTime(2017, 05, 14, 13, 53, 22, 222))
+              PreciseDateTime(DateTime(2017, 05, 14, 13, 53, 22, 222))
 
         @test ndx_wrap(1, 5) == 1
         @test ndx_wrap(6, 5) == 1
@@ -98,13 +93,12 @@ end
         ints_a = [(1, 2), (3, 4)]
         @test intervals_diff(ints_a, [(1, 2)]) == [(3, 4)]
         @test intervals_diff(ints_a, [(3, 5)]) == [(1, 2)]
-        @test intervals_diff(ints_a, NTuple{2, Int}[]) == ints_a
+        @test intervals_diff(ints_a, NTuple{2,Int}[]) == ints_a
         @test intervals_diff(ints_a, [(0, 1)]) == ints_a
         @test intervals_diff(ints_a, [(4, 5)]) == ints_a
-        @test intervals_diff(ints_a, [(1.2, 1.7)]) ==
-            [(1.0, 1.2), (1.7, 2.0), (3.0, 4.0)]
+        @test intervals_diff(ints_a, [(1.2, 1.7)]) == [(1.0, 1.2), (1.7, 2.0), (3.0, 4.0)]
         @test intervals_diff(ints_a, [(1.2, 1.7), (3.2, 3.7)]) ==
-            [(1.0, 1.2), (1.7, 2.0), (3.0, 3.2), (3.7, 4.0)]
+              [(1.0, 1.2), (1.7, 2.0), (3.0, 3.2), (3.7, 4.0)]
     end
 
     @testset "array" begin
@@ -124,12 +118,12 @@ end
         B = rand(20)
         C = rand(20)
 
-        cov([A,B,C])
+        cov([A, B, C])
     end
 
     @testset "mmap" begin
         test_len = 5
-        (arr, path) = typemmap(Vector{Int}, (2,); autoclean=true)
+        (arr, path) = typemmap(Vector{Int}, (2,); autoclean = true)
         A = rand(test_len)
         (mma, path) = to_mmap(A)
         @test all(mma .== A)
@@ -145,7 +139,7 @@ end
         @test allsame(1, 1)
         @test ! allsame(1, 2)
         @test allsame(1)
-        @test allsame(length, (1,2), (3, 4))
+        @test allsame(length, (1, 2), (3, 4))
     end
 
     @testset "files" begin

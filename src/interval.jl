@@ -1,6 +1,6 @@
 check_overlap(start1, stop1, start2, stop2) = (start1 <= stop2) & (start2 <= stop1)
 
-function check_overlap(tupa::NTuple{2, <:Number}, tupb::NTuple{2, <:Number})
+function check_overlap(tupa::NTuple{2,<:Number}, tupb::NTuple{2,<:Number})
     check_overlap(tupa[1], tupa[2], tupb[1], tupb[2])
 end
 
@@ -8,13 +8,13 @@ function is_subinterval(startchild, stopchild, startparent, stopparent)
     (startchild >= startparent) & (stopchild <= stopparent)
 end
 
-function is_subinterval(tupa::NTuple{2, <:Number}, tupb::NTuple{2, <:Number})
+function is_subinterval(tupa::NTuple{2,<:Number}, tupb::NTuple{2,<:Number})
     is_subinterval(tupa[1], tupa[2], tupb[1], tupb[2])
 end
 
-function check_overlap(a::AbstractVector{<:NTuple{2, <:Any}})
+function check_overlap(a::AbstractVector{<:NTuple{2}})
     na = length(a)
-    for i = 1:na, j = (i + 1):na
+    for i = 1:na, j = (i+1):na
         if check_overlap(a[i][1], a[i][2], a[j][1], a[j][2])
             return true
         end
@@ -23,7 +23,7 @@ function check_overlap(a::AbstractVector{<:NTuple{2, <:Any}})
 end
 
 # Assumes sorted
-function find_overlaps(a::AbstractVector{<:Tuple{<:Any, <:Any}})
+function find_overlaps(a::AbstractVector{<:Tuple{<:Any,<:Any}})
     na = length(a)
     overlap_idx = Vector{Vector{Int}}(undef, na)
     @inbounds @simd for i = 1:na
@@ -31,7 +31,7 @@ function find_overlaps(a::AbstractVector{<:Tuple{<:Any, <:Any}})
     end
     @inbounds for i = 1:na
         thisstop = a[i][2]
-        for j = (i + 1):na
+        for j = (i+1):na
             a[j][1] > thisstop && break
             push!(overlap_idx[i], j)
             push!(overlap_idx[j], i)
@@ -64,38 +64,34 @@ function find_all_overlapping(fa, fb, intsa, intsb)
     outs
 end
 
-find_all_overlapping(intsa, intsb) =
-    find_all_overlapping(identity, identity, intsa, intsb)
+find_all_overlapping(intsa, intsb) = find_all_overlapping(identity, identity, intsa, intsb)
 
-function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where T
+function interval_intersect(start1::T, stop1::T, start2::T, stop2::T) where {T}
     ifelse(
         check_overlap(start1, stop1, start2, stop2),
         (max(start1, start2), min(stop1, stop2)),
-        nothing
+        nothing,
     )
 end
 
-interval_intersect(b1, e1, b2, e2) =
-    interval_intersect(promote(b1, e1, b2, e2)...)
+interval_intersect(b1, e1, b2, e2) = interval_intersect(promote(b1, e1, b2, e2)...)
 
-function interval_intersect(a::NTuple{2, <:Any}, b::NTuple{2, <:Any})
+function interval_intersect(a::NTuple{2}, b::NTuple{2})
     interval_intersect(a[1], a[2], b[1], b[2])
 end
 
-function interval_intersect_measure(
-    start1::T, stop1::T, start2::T, stop2::T
-) where T
+function interval_intersect_measure(start1::T, stop1::T, start2::T, stop2::T) where {T}
     ifelse(
         check_overlap(start1, stop1, start2, stop2),
         min(stop1, stop2) - max(start1, start2),
-        zero(T)
+        zero(T),
     )
 end
 
 interval_intersect_measure(b1, e1, b2, e2) =
     interval_intersect_measure(promote(b1, e1, b2, e2)...)
 
-function interval_intersect_measure(a::NTuple{2, <:Any}, b::NTuple{2, <:Any})
+function interval_intersect_measure(a::NTuple{2}, b::NTuple{2})
     interval_intersect_measure(a[1], a[2], b[1], b[2])
 end
 
@@ -109,12 +105,12 @@ Returns a boolean.
 """
 function _intervals_are_ordered(f, crit, ints)
     iter_result = iterate(ints)
-    iter_result == nothing && return true
+    isnothing(iter_result) && return true
     element, state = iter_result
     prev_start, prev_end = f(element)
     ok = prev_start <= prev_end
     iter_result = iterate(ints, state)
-    while ok & (iter_result != nothing)
+    while ok & !isnothing(iter_result)
         (element, state) = iter_result
         a, b = f(element)
         ok &= a <= b
@@ -131,8 +127,7 @@ intervals_are_ordered(ints) = intervals_are_ordered(identity, ints)
 
 intervals_are_partially_ordered(f, ints) =
     _intervals_are_ordered(f, partially_ordered_crit, ints)
-intervals_are_partially_ordered(ints) =
-    intervals_are_partially_ordered(identity, ints)
+intervals_are_partially_ordered(ints) = intervals_are_partially_ordered(identity, ints)
 
 """
 Assumes each list is sorted and non-overlapping
@@ -218,9 +213,7 @@ function interval_intersections_overlapping(intsa, intsb)
     ib = 1
     working_intersects = similar(intsa, 0)
     for (ab, ae) in intsa
-        nout = flush_growing_intersect_intervals!(
-            outs, nout, working_intersects, ab
-        )
+        nout = flush_growing_intersect_intervals!(outs, nout, working_intersects, ab)
         while ib <= nb && intsb[ib][2] <= ab
             ib += 1
         end
@@ -241,39 +234,39 @@ function interval_intersections_overlapping(intsa, intsb)
     outs
 end
 
-measure(a::NTuple{2, <:Number}) = a[2] - a[1]
-measure(::Nothing) = 0
+@inline measure(a::NTuple{2,<:Number}) = a[2] - a[1]
+@inline measure(::Nothing) = 0
 
-midpoint(a::NTuple{2, <:Number}) = (a[1] + a[2]) / 2
+@inline midpoint(a::NTuple{2,<:Number}) = (a[1] + a[2]) / 2
 
-function reduce_extrema(s1::T, s2::T, t1::T, t2::T) where T<:Number
+function reduce_extrema(s1::T, s2::T, t1::T, t2::T) where {T<:Number}
     return (min(s1, t1), max(s2, t2))
 end
-function reduce_extrema(s::NTuple{2, T}, t::NTuple{2, T}) where T<:Number
+function reduce_extrema(s::NTuple{2,T}, t::NTuple{2,T}) where {T<:Number}
     return reduce_extrema(s..., t...)
 end
 
 extrema_red(a::AbstractVector{<:Number}) = extrema(a)
 
-function extrema_red(a::AbstractArray{<:Number, 2})
+function extrema_red(a::AbstractArray{<:Number,2})
     na = size(a, 2)
     na > 0 || throw(ArgumentError("Collection must not be empty"))
     size(a, 1) == 2 || throw(ArgumentError("First dimension must be size 2"))
     cmin = a[1, 1]
     cmax = a[2, 1]
-    for i in 2:na
+    for i = 2:na
         cmin = min(cmin, a[1, i])
         cmax = max(cmax, a[2, i])
     end
     return (cmin, cmax)
 end
 
-function extrema_red(a::A) where {T<:NTuple{2, Number}, A<:AbstractVector{T}}
+function extrema_red(a::A) where {T<:NTuple{2,Number},A<:AbstractVector{T}}
     na = length(a)
     na > 0 || throw(ArgumentError("Collection must not be empty"))
     cmin = a[1][1]
     cmax = a[1][2]
-    for i in 2:na
+    for i = 2:na
         cmin = min(cmin, a[i][1])
         cmax = max(cmax, a[i][2])
     end
@@ -283,14 +276,14 @@ end
 Base.@deprecate_binding clip clamp
 
 function clip_int(
-    int_begin::Number, int_end::Number, bound_begin::Number, bound_end::Number
+    int_begin::Number,
+    int_end::Number,
+    bound_begin::Number,
+    bound_end::Number,
 )
-    (
-        clamp(int_begin, bound_begin, bound_end),
-        clamp(int_end, bound_begin, bound_end)
-    )
+    (clamp(int_begin, bound_begin, bound_end), clamp(int_end, bound_begin, bound_end))
 end
-function clip_int(input::NTuple{2, <:Number}, bounds::NTuple{2, <:Number})
+function clip_int(input::NTuple{2,<:Number}, bounds::NTuple{2,<:Number})
     clip_int(input..., bounds...)
 end
 
@@ -306,7 +299,7 @@ function join_intervals! end
 
 function join_intervals!(
     f::Function,
-    ints::AbstractVector{<:NTuple{2, <:Number}},
+    ints::AbstractVector{<:NTuple{2,<:Number}},
     min_gap::Number = 0,
 )
     nint = length(ints)
@@ -317,7 +310,7 @@ function join_intervals!(
     outno = 0
     joined_start = ints[1][1]
     prev_end = ints[1][2]
-    for intno in 2:nint
+    for intno = 2:nint
         int = ints[intno]
         if int[1] - prev_end > min_gap
             # End last stretch
@@ -332,66 +325,58 @@ function join_intervals!(
     clipsize!(ints, outno)
     ints
 end
-join_intervals!(ints::AbstractVector, args...) =
-    join_intervals!(identity, ints, args...)
+join_intervals!(ints::AbstractVector, args...) = join_intervals!(identity, ints, args...)
 
 """
     join_intervals(f, ints::Vector{NTuple{2, <:Number}}, min_gap)
 
 Like [`join_intervals!`](@ref), but does not mutate input.
 """
-join_intervals(f, ints::AbstractVector, args...) =
-    join_intervals!(f, copy(ints), args...)
+join_intervals(f, ints::AbstractVector, args...) = join_intervals!(f, copy(ints), args...)
 
-join_intervals(ints::AbstractVector, args...) =
-    join_intervals(identity, ints, args...)
+join_intervals(ints::AbstractVector, args...) = join_intervals(identity, ints, args...)
 
 function interval_complements(
     start::T,
     stop::T,
-    intervals::AbstractVector{<:NTuple{2, T}},
-    contraction::Number = 0
-) where T
+    intervals::AbstractVector{<:NTuple{2,T}},
+    contraction::Number = 0,
+) where {T}
     nint = length(intervals)
     if nint == 0
         if stop - start > 2 * contraction
-            return NTuple{2, T}[(start + contraction, stop - contraction)]
+            return NTuple{2,T}[(start + contraction, stop - contraction)]
         else
-            return Vector{NTuple{2, T}}()
+            return Vector{NTuple{2,T}}()
         end
     end
-    complement = Vector{NTuple{2, T}}(undef, nint + 1)
+    complement = Vector{NTuple{2,T}}(undef, nint + 1)
     gapno = 0
     if intervals[1][1] - start > contraction
         gapno += 1
-        complement[gapno] = (
-            start + contraction,
-            intervals[1][1] - contraction
-        )
+        complement[gapno] = (start + contraction, intervals[1][1] - contraction)
     end
-    for i in 1:(nint - 1)
-        if intervals[i + 1][1] - intervals[i][2] > 2 * contraction
+    for i = 1:(nint-1)
+        if intervals[i+1][1] - intervals[i][2] > 2 * contraction
             gapno += 1
-            complement[gapno] = (
-                intervals[i][2] + contraction,
-                intervals[i + 1][1] - contraction
-            )
+            complement[gapno] =
+                (intervals[i][2] + contraction, intervals[i+1][1] - contraction)
         end
     end
     if stop - intervals[end][2] > contraction
         gapno += 1
-        complement[gapno] = (
-            intervals[end][2] + contraction,
-            stop - contraction
-        )
+        complement[gapno] = (intervals[end][2] + contraction, stop - contraction)
     end
     clipsize!(complement, gapno)
     complement
 end
 
 function interval_complements(
-    start, stop, intervals::AbstractVector{<:NTuple{2, T}}, args...
-) where T
+    start,
+    stop,
+    intervals::AbstractVector{<:NTuple{2,T}},
+    args...,
+) where {T}
     interval_complements(convert(T, start), convert(T, stop), intervals, args...)
 end
 
@@ -409,13 +394,15 @@ Find the indices in `basis` that correspond to the interval specified by `start`
  and `stop`.
 """
 function interval_indices(
-    basis::Union{<:AbstractVector, AbstractRange}, start::Number, stop::Number
+    basis::Union{<:AbstractVector,AbstractRange},
+    start::Number,
+    stop::Number,
 )
     i_b = searchsortedfirst(basis, start)
     i_e = searchsortedlast(basis, stop)
     i_b, i_e
 end
-interval_indices(basis::AbstractVector, bnds::NTuple{2, <:Number}) =
+interval_indices(basis::AbstractVector, bnds::NTuple{2,<:Number}) =
     interval_indices(basis, bnds[1], bnds[2])
 
 """
@@ -425,14 +412,14 @@ interval_indices(basis::AbstractVector, bnds::NTuple{2, <:Number}) =
 Join points in `x` into ranges, if the difference between neighboring elements
 is less than `min_gap`. Assumes `x` is sorted.
 """
-function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
+function throttle(xs::AbstractVector{T}, min_gap::Number) where {T<:Number}
     nx = length(xs)
-    out = Vector{NTuple{2, T}}(undef, nx)
+    out = Vector{NTuple{2,T}}(undef, nx)
     nx == 0 && return out
     @inbounds joined_start = xs[1]
     last_x = joined_start
     nout = 0
-    @inbounds for i in 2:nx
+    @inbounds for i = 2:nx
         x = xs[i]
         if x - last_x > min_gap
             nout += 1
@@ -447,7 +434,7 @@ function throttle(xs::AbstractVector{T}, min_gap::Number) where T<:Number
     out
 end
 
-in(reg::NTuple{2, <:Number}, x::Number) = (x >= reg[1]) & (x <= reg[2])
+in(reg::NTuple{2,<:Number}, x::Number) = (x >= reg[1]) & (x <= reg[2])
 
 """
     intervals_diff(ints_a, ints_b) -> ints_out
@@ -456,14 +443,14 @@ Find the 'set diff' of the intervals in `ints_a` and `ints_b`. Assumes both
 inputs are sorted.
 """
 function intervals_diff(
-    ints_a::AbstractVector{<:NTuple{2, S}},
-    ints_b::AbstractVector{<:NTuple{2, T}}
-) where {S<:Number, T<:Number}
+    ints_a::AbstractVector{<:NTuple{2,S}},
+    ints_b::AbstractVector{<:NTuple{2,T}},
+) where {S<:Number,T<:Number}
     na = length(ints_a)
     nb = length(ints_b)
     nb == 0 && return copy(ints_a)
     out_type = promote_type(S, T)
-    ints_out = Vector{NTuple{2, out_type}}(undef, na + nb + 1)
+    ints_out = Vector{NTuple{2,out_type}}(undef, na + nb + 1)
     out_no = 0
     b_no = 1
     for a_no = 1:na
@@ -474,23 +461,24 @@ function intervals_diff(
         # Break if no intervals in b could overlap with a
         if b_no > nb
             n_a_rest = n_ndx(a_no, na)
-            ints_out[out_no + 1:out_no + n_a_rest] .= convert.(
-                NTuple{2, out_type}, view(ints_a, a_no:na)
-            )
+            ints_out[(out_no+1):(out_no+n_a_rest)] .=
+                convert.(NTuple{2,out_type}, view(ints_a, a_no:na))
             out_no += n_a_rest
             break
         end
         last_b = b_no - 1 # Allow for no overlap by using b_no - 1
         # Find which b intervals overlap with this a interval
-        while last_b < nb && check_overlap(ints_a[a_no], ints_b[last_b + 1])
+        while last_b < nb && check_overlap(ints_a[a_no], ints_b[last_b+1])
             last_b += 1
         end
         # Find complement between this a interval and overlapping b intervals
         complements = interval_complements(
-            ints_a[a_no][1], ints_a[a_no][2], view(ints_b, b_no:last_b)
+            ints_a[a_no][1],
+            ints_a[a_no][2],
+            view(ints_b, b_no:last_b),
         )
         nc = length(complements)
-        ints_out[out_no + 1:out_no + nc] = complements
+        ints_out[(out_no+1):(out_no+nc)] = complements
         out_no += nc
         # Skip over used intervals in b
         b_no = ifelse(last_b > b_no, last_b, b_no)
@@ -499,9 +487,7 @@ function intervals_diff(
     ints_out
 end
 
-function expand_intervals!(
-    ints_in::AbstractVector{<:NTuple{2, <:Number}}, expand::Number
-)
+function expand_intervals!(ints_in::AbstractVector{<:NTuple{2,<:Number}}, expand::Number)
     half_exp = expand / 2
     f = ((b, e),) -> (b - half_exp, e + half_exp)
     join_intervals!(f, ints_in, expand)
@@ -527,7 +513,7 @@ function parse_ranges_str(s::AbstractString)
             @inbounds push!(ranges, bnds[i][1])
         elseif nbnd == 2
             @inbounds b, e = extrema(bnds[i])
-            for v in b:e
+            for v = b:e
                 push!(ranges, v)
             end
         else
@@ -538,18 +524,21 @@ function parse_ranges_str(s::AbstractString)
 end
 
 measure_to_bounds(a::Number, b::Number) = (a, a + b)
-measure_to_bounds(t::NTuple{2, <:Any}) = measure_to_bounds(t[1], t[2])
-measure_to_bounds(ts::AbstractArray{<:NTuple{2, <:Any}}) = measure_to_bounds.(ts)
+measure_to_bounds(t::NTuple{2}) = measure_to_bounds(t[1], t[2])
+measure_to_bounds(ts::AbstractArray{<:NTuple{2}}) = measure_to_bounds.(ts)
 measure_to_bounds(a::AbstractArray, b::AbstractArray) = measure_to_bounds.(a, b)
 
 "Clip an interval while trying to maintain its duration"
 function clip_interval_duration(
-    reqb::T, reqe::T, boundmin::T, boundmax::T
-) where T<:Number
+    reqb::T,
+    reqe::T,
+    boundmin::T,
+    boundmax::T,
+) where {T<:Number}
     adj_b = max(zero(T), boundmin - reqb)
     adj_e = -max(zero(T), reqe - boundmax)
     adj = adj_b + adj_e
-    clipped_b = reqb  + adj
+    clipped_b = reqb + adj
     clipped_e = reqe + adj
     req_int_smaller = reqe - reqb < boundmax - boundmin
     actual_b = ifelse(req_int_smaller, clipped_b, boundmin)
@@ -560,16 +549,14 @@ end
 clip_interval_duration(a, b, c, d) = clip_interval_duration(promote(a, b, c, d)...)
 clip_interval_duration(reqb::Number, reqe, boundmax) =
     clip_interval_duration(reqb, reqe, 0, boundmax)
-clip_interval_duration(int::NTuple{2, <:Any}, intb::NTuple{2, <:Any}) =
+clip_interval_duration(int::NTuple{2}, intb::NTuple{2}) =
     clip_interval_duration(int..., intb...)
-clip_interval_duration(int::NTuple{2, <:Any}, boundmin, boundmax) =
+clip_interval_duration(int::NTuple{2}, boundmin, boundmax) =
     clip_interval_duration(int[1], int[2], boundmax)
-clip_exampl_interval(int::NTuple{2, <:Any}, boundmax::Number) =
+clip_exampl_interval(int::NTuple{2}, boundmax::Number) =
     clip_interval_duration(int, 0, boundmax)
 
-function maximum_interval_overlap(
-    xs::AbstractVector{NTuple{2, T}}, y::NTuple{2, T}
-) where T
+function maximum_interval_overlap(xs::AbstractVector{NTuple{2,T}}, y::NTuple{2,T}) where {T}
     best_ndx = 0
     best_overlap = typemin(T)
     for i in eachindex(xs)

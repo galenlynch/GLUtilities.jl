@@ -1,9 +1,9 @@
 function weighted_mean_dim(
-    summand::AbstractArray{E, N},
+    summand::AbstractArray{E,N},
     weights::AbstractVector{T},
     dim::Integer = N,
-    total_weight::T = sum(weights)
-) where {E<:Number, N, T<:Number}
+    total_weight::T = sum(weights),
+) where {E<:Number,N,T<:Number}
     F = promote_type(E, T)
 
     dims = collect(size(summand))
@@ -11,7 +11,7 @@ function weighted_mean_dim(
 
     slice_idx = collect(make_slice_idx(N, dim, 1))
     reduced = zeros(F, (dims...,))
-    for i in 1:size(summand, dim)
+    for i = 1:size(summand, dim)
         slice_idx[dim] = i
         reduced .+= summand[slice_idx...] .* weights[i]
     end
@@ -20,10 +20,10 @@ function weighted_mean_dim(
 end
 
 function weighted_mean(
-    summand::AbstractArray{E, N},
-    weights::AbstractArray{T, N},
-    total_weight::T = sum(weights)
-) where {E<:Number, N, T<:Number}
+    summand::AbstractArray{E,N},
+    weights::AbstractArray{T,N},
+    total_weight::T = sum(weights),
+) where {E<:Number,N,T<:Number}
     if size(summand) != size(weights)
         throw(ArgumentError("Sizes are not the same"))
     end
@@ -38,8 +38,8 @@ end
 function weighted_mean(
     summand::AbstractArray{E,N},
     weights::AbstractArray{T,N},
-    total_weight::T = sum(weights)
-) where {G<:Number, E<:AbstractArray{G, <:Any}, N, T<:Number}
+    total_weight::T = sum(weights),
+) where {G<:Number,E<:AbstractArray{G},N,T<:Number}
     # assumes elements of summand have the same size
     if size(summand) != size(weights)
         throw(ArgumentError("Sizes are not the same"))
@@ -57,13 +57,13 @@ end
 
 function local_extrema(s::AbstractVector, comp::Function = >)
     ns = length(s)
-    @compat idxes = Vector{Int}(undef, div(ns, 2))
+    idxes = Vector{Int}(undef, div(ns, 2))
     out_i = 0
     if ns > 2
         @inbounds last_comp = comp(s[1], s[2])
-        for i in 2:(ns - 1)
-            @inbounds this_comp = comp(s[i], s[i + 1])
-            if this_comp && ! last_comp
+        for i = 2:(ns-1)
+            @inbounds this_comp = comp(s[i], s[i+1])
+            if this_comp && !last_comp
                 out_i += 1
                 @inbounds idxes[out_i] = i
             end
@@ -74,14 +74,14 @@ function local_extrema(s::AbstractVector, comp::Function = >)
     idxes
 end
 
-function cov(as::AbstractVector{<:AbstractVector{T}}) where T<:Real
+function cov(as::AbstractVector{<:AbstractVector{T}}) where {T<:Real}
     allsame(length, as) || throw(ArgumentError("Lengths must be the same"))
     na = length(as)
     S = div_type(T)
     cov = zeros(S, na, na)
     if na > 0
-        @compat means = Vector{S}(undef, na)
-        @compat scratch = Vector{S}(undef, na)
+        means = Vector{S}(undef, na)
+        scratch = Vector{S}(undef, na)
         @inbounds for (i, a) in enumerate(as)
             means[i] = mean(a)
         end
@@ -114,18 +114,18 @@ subtraction of ordered lists.
 # Examples
 ```julia-repl
 julia> pairwise_idxs(3)
-3-element Array{Tuple{Int64,Int64},1}:
+3-element Vector{Tuple{Int64,Int64}}:
  (2, 1)
  (3, 1)
  (3, 2)
 ```
 """
 function pairwise_idxs(n::Integer)
-    idxs = Vector{NTuple{2, Int}}(undef, convert(Int, n * (n - 1) / 2))
+    idxs = Vector{NTuple{2,Int}}(undef, convert(Int, n * (n - 1) / 2))
     offset = 0
-    @inbounds for i = 1:(n - 1)
-        @simd for j = 1:(n - i)
-            idxs[offset + j] = (i + j, i)
+    @inbounds for i = 1:(n-1)
+        @simd for j = 1:(n-i)
+            idxs[offset+j] = (i + j, i)
         end
         offset += n - i
     end
@@ -138,41 +138,43 @@ _pairwise_idx(i, j, n) = i - j + div((j - 1) * (2 * (n - 1) - (j - 2)), 2)
 """
 n_el is the number of elements in the INPUT to pairwise diff
 """
-function pairwise_idx(i::T, j::T, n) where T
+function pairwise_idx(i::T, j::T, n) where {T}
     i == j && throw(ArgumentError("invalid indices"))
     lower, upper = ifelse(i < j, (i, j), (j, i))
     _pairwise_idx(upper, lower, n)
 end
 
-function map_pairwise(f::F, a::AbstractVector{T}, ::Type{R} = T) where {F, T, R}
+function map_pairwise(f::F, a::AbstractVector{T}, ::Type{R} = T) where {F,T,R}
     n = length(a)
     out = Vector{R}(undef, convert(Int, n * (n - 1) / 2))
     offset = 0
-    for i in 1 : n - 1
-        @inbounds @simd for j in 1 : n - i
-            out[offset + j] = f(a[i + j], a[i])
+    for i = 1:(n-1)
+        @inbounds @simd for j = 1:(n-i)
+            out[offset+j] = f(a[i+j], a[i])
         end
         offset += n - i
     end
     out
 end
 
-function map_pairwise(f::F, as::AbstractVector{T}, bs::AbstractVector, ::Type{R} = T) where {F, T, R}
+function map_pairwise(
+    f::F,
+    as::AbstractVector{T},
+    bs::AbstractVector,
+    ::Type{R} = T,
+) where {F,T,R}
     na = length(as)
     nb = length(bs)
     out = Matrix{R}(undef, nb, na)
-    @inbounds @simd for i in 1:na
-        for j in 1:nb
+    @inbounds @simd for i = 1:na
+        for j = 1:nb
             out[j, i] = f(as[i], bs[j])
         end
     end
     out
 end
 
-imap_product(f, as, bs) = imap(
-    x -> @inbounds(f(x[1], x[2])),
-    Iterators.product(as, bs)
-)
+imap_product(f, as, bs) = imap(x -> @inbounds(f(x[1], x[2])), Iterators.product(as, bs))
 
 function pmap_pairwise(f::Function, as::AbstractVector)
     pairs = pairwise_idxs(length(as))
@@ -189,14 +191,14 @@ function find_subseq(subseq, seq)
     nseq = length(seq)
     nsub > nseq && return Vector{Int}()
     max_idx = nseq - nsub + 1
-    @compat imatch = Vector{Int}(undef, max_idx)
+    imatch = Vector{Int}(undef, max_idx)
     nmatch = 0
     idx = 1
-    while (idx = findnext(p, seq, idx)) != nothing
+    while !isnothing(idx = findnext(p, seq, idx))
         idx > max_idx && break
         ismatch = true
         @inbounds for i = 2:nsub
-            if seq[idx + i - 1] != subseq[i]
+            if seq[idx+i-1] != subseq[i]
                 ismatch = false
                 break
             end
@@ -213,10 +215,12 @@ end
 
 function subselect(
     base_vec,
-    idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
+    idx_tup_vec::AbstractVector{<:NTuple{2}},
     outtype::Type{T} = ifelse(
-        base_vec isa AbstractVector, typeof(base_vec), Vector{eltype(base_vec)}
-    )
+        base_vec isa AbstractVector,
+        typeof(base_vec),
+        Vector{eltype(base_vec)},
+    ),
 ) where {T<:AbstractVector}
     nout = length(idx_tup_vec)
     out = Vector{T}(undef, nout)
@@ -229,9 +233,9 @@ end
 
 function subselect(
     base_vec,
-    idx_tup_vec::AbstractVector{<:NTuple{2, <:Any}},
-    outtype::Type{T}
-) where T<:SharedVector
+    idx_tup_vec::AbstractVector{<:NTuple{2}},
+    outtype::Type{T},
+) where {T<:SharedVector}
     nout = length(idx_tup_vec)
     out = Vector{T}(undef, nout)
     for i = 1:nout
@@ -278,7 +282,7 @@ function quantiles_mmap(v, p; kwargs...)
     q
 end
 
-function mad_quantiles!(out::AbstractVector{T}, a::AbstractVector) where T <: AbstractFloat
+function mad_quantiles!(out::AbstractVector{T}, a::AbstractVector) where {T<:AbstractFloat}
     # Allocation
     na = length(a)
     length(out) == na || throw(ArgumentError("a and out not the same length"))
@@ -304,44 +308,44 @@ end
 mad_quantiles(a) = mad_quantiles!(similar(a, Float32), a)
 
 """
-    skipnothing(itr)
-Return an iterator over the elements in `itr` skipping [`nothing`](@ref) values.
-Use [`collect`](@ref) to obtain an `Array` containing the non-`nothing` values in
+    skipoftype(::Type{T}, itr)
+Return an iterator over the elements in `itr` skipping values of type `T`.
+Use `collect` to obtain an `Array` containing the non-`T` values in
 `itr`. Note that even if `itr` is a multidimensional array, the result will always
 be a `Vector` since it is not possible to remove nothings while preserving dimensions
 of the input.
 # Examples
 ```jldoctest
-julia> sum(skipnothing([1, nothing, 2]))
+julia> sum(GLUtilities.skipoftype(nothing, [1, nothing, 2]))
 3
-julia> collect(skipnothing([1, nothing, 2]))
-2-element Array{Int64,1}:
+julia> collect(GLUtilities.skipoftype(nothing, [1, nothing, 2]))
+2-element Vector{Int64}:
  1
  2
-julia> collect(skipnothing([1 nothing; 2 nothing]))
-2-element Array{Int64,1}:
+julia> collect(GLUtilities.skipoftype(nothing, [1 nothing; 2 nothing]))
+2-element Vector{Int64}:
  1
  2
 ```
 """
-skipoftype(::Type{T}, itr::A) where {T, A} = SkipOfType{T, A}(itr)
-skipoftype(::T, itr) where T = skipoftype(T, itr)
+skipoftype(::Type{T}, itr::A) where {T,A} = SkipOfType{T,A}(itr)
+skipoftype(::T, itr) where {T} = skipoftype(T, itr)
 
-struct SkipOfType{T, A}
+struct SkipOfType{T,A}
     x::A
 end
 
 IteratorSize(::Type{<:SkipOfType}) = SizeUnknown()
-IteratorEltype(::Type{SkipOfType{T, A}}) where {T, A} = IteratorEltype(A)
-eltype(::Type{SkipOfType{T, A}}) where {T, A} = union_poptype(T, eltype(A))
+IteratorEltype(::Type{SkipOfType{T,A}}) where {T,A} = IteratorEltype(A)
+eltype(::Type{SkipOfType{T,A}}) where {T,A} = union_poptype(T, eltype(A))
 
-function iterate(itr::SkipOfType{T, <:Any}, state...) where T
+function iterate(itr::SkipOfType{T}, state...) where {T}
     y = iterate(itr.x, state...)
-    y === nothing && return nothing
+    isnothing(y) && return nothing
     item, state = y
     while item isa T
         y = iterate(itr.x, state)
-        y === nothing && return nothing
+        isnothing(y) && return nothing
         item, state = y
     end
     item, state
@@ -350,13 +354,11 @@ end
 # Optimized mapreduce implementation
 # The generic method is faster when !(eltype(A) >: Nothing) since it does not need
 # additional loops to identify the two first non-nothing values of each block
-function mapreduce(f, op, itr::SkipOfType{T, <:AbstractArray}) where T
+function mapreduce(f, op, itr::SkipOfType{T,<:AbstractArray}) where {T}
     _mapreduce(f, op, IndexStyle(itr.x), eltype(itr.x) >: T ? itr : itr.x)
 end
 
-function _mapreduce(
-    f, op, ::IndexLinear, itr::SkipOfType{T, <:AbstractArray}
-) where T
+function _mapreduce(f, op, ::IndexLinear, itr::SkipOfType{T,<:AbstractArray}) where {T}
     A = itr.x
     local ai
     inds = LinearIndices(A)
@@ -364,7 +366,7 @@ function _mapreduce(
     ilast = last(inds)
     while i <= ilast
         @inbounds ai = A[i]
-        ai isa T  || break
+        ai isa T || break
         i += 1
     end
     i > ilast && return mapreduce_empty(f, op, eltype(itr))
@@ -387,9 +389,13 @@ mapreduce_impl(f, op, A::SkipOfType, ifirst::Integer, ilast::Integer) =
 
 # Returns nothing when the input contains only nothing values
 @noinline function mapreduce_impl(
-    f, op, itr::SkipOfType{T, <:AbstractArray}, ifirst::Integer, ilast::Integer,
-    blksize::Int
-) where T
+    f,
+    op,
+    itr::SkipOfType{T,<:AbstractArray},
+    ifirst::Integer,
+    ilast::Integer,
+    blksize::Int,
+) where {T}
     A = itr.x
     if ifirst == ilast
         @inbounds a1 = A[ifirst]
@@ -431,11 +437,11 @@ mapreduce_impl(f, op, A::SkipOfType, ifirst::Integer, ilast::Integer) =
         imid = (ifirst + ilast) >> 1
         v1 = mapreduce_impl(f, op, itr, ifirst, imid, blksize)
         v2 = mapreduce_impl(f, op, itr, imid+1, ilast, blksize)
-        if v1 === nothing && v2 === nothing
+        if isnothing(v1) && isnothing(v2)
             return nothing
-        elseif v1 === nothing
+        elseif isnothing(v1)
             return v2
-        elseif v2 === nothing
+        elseif isnothing(v2)
             return v1
         else
             return Some(op(something(v1), something(v2)))
@@ -443,11 +449,11 @@ mapreduce_impl(f, op, A::SkipOfType, ifirst::Integer, ilast::Integer) =
     end
 end
 
-_union_poptype(::Type{T}, ::Type{Union{T,S}}) where {T, S} = S
+_union_poptype(::Type{T}, ::Type{Union{T,S}}) where {T,S} = S
 _union_poptype(::Type{T}, ::Type{T}) where {T} = Union{}
 
 # Necessary for cases like _union_poptype(Union{A,B}, Union{A,C})
-union_poptype(::Type{T}, ::Type{S}) where {T, S} = _union_poptype(T, Union{T,S})
+union_poptype(::Type{T}, ::Type{S}) where {T,S} = _union_poptype(T, Union{T,S})
 
 skipnothing(itr) = skipoftype(Nothing, itr)
 
@@ -462,7 +468,7 @@ function _moving_sum!(out, s, nav, nout)
         end
         @inbounds for i = 2:nout
             # The only thing that changes is the first and last part of the window
-            out[i] = out[i - 1] + s[i + nav - 1] - s[i - 1]
+            out[i] = out[i-1] + s[i+nav-1] - s[i-1]
         end
     end
     out
@@ -511,16 +517,12 @@ function trailing_zeros_idx(arr)
     last_idx
 end
 
-function thresh_cross(
-    arr,
-    thresh,
-    comp = <
-)
+function thresh_cross(arr, thresh, comp = <)
     l = length(arr)
     idx_cross = Vector{Int}(undef, div(l, 2))
     out_no = 0
-    for i in 1:l - 1
-        if comp(arr[i], thresh) & (! comp(arr[i + 1], thresh))
+    for i = 1:(l-1)
+        if comp(arr[i], thresh) & (!comp(arr[i+1], thresh))
             out_no += 1
             idx_cross[out_no] = i + 1
         end
@@ -529,7 +531,7 @@ function thresh_cross(
     idx_cross
 end
 
-centered_basis(n_point) = (0:n_point - 1) .- (n_point - 1) / 2
+centered_basis(n_point) = (0:(n_point-1)) .- (n_point - 1) / 2
 
 stepsize(r::StepRangeLen) = Float64(r.step)
 stepsize(::UnitRange) = 1
@@ -568,7 +570,7 @@ end
 
 Like [`glhist!`](@ref).
 """
-glhist(::Type{T}, xs, r) where T = _glhist!(zeros(T, length(r) - 1), xs, r)
+glhist(::Type{T}, xs, r) where {T} = _glhist!(zeros(T, length(r) - 1), xs, r)
 glhist(xs, r) = glhist(Int, xs, r)
 
 function find_local_extrema(
@@ -584,20 +586,22 @@ function find_local_extrema(
     bias = ifelse(right_on_ties, 1, -1)
     if ismissing(sig[start_ndx]) || isnan(sig[start_ndx])
         newstart = findfirst(x -> !(ismissing(x) | isnan(x)), sig)
-        newstart == nothing && error("None valid")
+        isnothing(newstart) && error("None valid")
     end
     search_ndx = start_ndx
     iterno = 0
     maxiter = 2 * sigl
     @inbounds while iterno < maxiter
-        notleft = search_ndx == 1 ||
-            ismissing(sig[search_ndx - 1]) ||
-            isnan(sig[search_ndx - 1]) ||
-            comp(sig[search_ndx], sig[search_ndx - 1])
-        notright = search_ndx == sigl ||
-            ismissing(sig[search_ndx + 1]) ||
-            isnan(sig[search_ndx + 1]) ||
-            comp(sig[search_ndx], sig[search_ndx + 1])
+        notleft =
+            search_ndx == 1 ||
+            ismissing(sig[search_ndx-1]) ||
+            isnan(sig[search_ndx-1]) ||
+            comp(sig[search_ndx], sig[search_ndx-1])
+        notright =
+            search_ndx == sigl ||
+            ismissing(sig[search_ndx+1]) ||
+            isnan(sig[search_ndx+1]) ||
+            comp(sig[search_ndx], sig[search_ndx+1])
         if notleft & notright
             return search_ndx
         else
@@ -686,7 +690,7 @@ function filtermap(p::Function, f::Function, xs::AbstractVector)
             nout = 1
             out[1] = m_el1
         end
-        for elno in 2:length(xs)
+        for elno = 2:length(xs)
             if p(xs[elno])
                 nout += 1
                 out[nout] = f(xs[elno])
@@ -703,19 +707,19 @@ end
 Returns the indices of all redundant elements in a. The time a value is
 seen, it is not considered redundant
 """
-function find_not_unique(a::AbstractArray{T}) where T
+function find_not_unique(a::AbstractArray{T}) where {T}
     na = length(a)
 
     # Stores the first seen index, and if the index is a known
     # duplicate
-    seen_els = Dict{T, Tuple{Int, Bool}}()
+    seen_els = Dict{T,Tuple{Int,Bool}}()
     sizehint!(seen_els, na)
     redundant_ndxs = Vector{Int}(undef, na)
     outno = 0
     for (i, el) in enumerate(a)
         if haskey(seen_els, el)
             (first_ndx, duplicated) = seen_els[el]
-            if ! duplicated
+            if !duplicated
                 seen_els[el] = (first_ndx, true)
                 outno += 1
                 redundant_ndxs[outno] = first_ndx
@@ -732,8 +736,8 @@ end
 
 clipsize!(a::AbstractVector, n::Integer) = sizehint!(resize!(a, n), n)
 
-to_ntuple(::Type{T}, args::Tuple) where T = map(x -> convert(T, x), args)
-to_ntuple(::Type{T}, args...) where T = to_ntuple(T, args)
+to_ntuple(::Type{T}, args::Tuple) where {T} = map(x -> convert(T, x), args)
+to_ntuple(::Type{T}, args...) where {T} = to_ntuple(T, args)
 
 function flatten_nested_map(funcs::Tuple, nested)
     if length(funcs) == 1
@@ -741,7 +745,7 @@ function flatten_nested_map(funcs::Tuple, nested)
     else
         flatten_nested_map(
             Base.tail(funcs),
-            collect(Iterators.Flatten(imap(first(funcs), nested)))
+            collect(Iterators.Flatten(imap(first(funcs), nested))),
         )
     end
 end
@@ -753,7 +757,7 @@ end
 function find_all_edge_triggers(arr, thr, comp = >=)
     indices = Int[]
     @inbounds for i = 2:length(arr)
-        if comp(arr[i], thr) & !comp(arr[i - 1], thr)
+        if comp(arr[i], thr) & !comp(arr[i-1], thr)
             push!(indices, i)
         end
     end
@@ -762,7 +766,7 @@ end
 
 function find_first_edge_trigger(arr, thr, comp = >=)
     @inbounds for i = 2:length(arr)
-        if comp(arr[i], thr) & !comp(arr[i - 1], thr)
+        if comp(arr[i], thr) & !comp(arr[i-1], thr)
             return i
         end
     end
@@ -775,19 +779,19 @@ function indices_above_thresh(arr, thr)
     lasti = 0
     for (i, el) in enumerate(arr)
         above_thr = el >= thr
-        if curr_start === nothing
+        if isnothing(curr_start)
             if above_thr
                 curr_start = i
             end
         else
             if !above_thr
-                push!(out, curr_start:i-1)
+                push!(out, curr_start:(i-1))
                 curr_start = nothing
             end
         end
         lasti = i
     end
-    if curr_start !== nothing
+    if !isnothing(curr_start)
         push!(out, curr_start:lasti)
     end
     return out
