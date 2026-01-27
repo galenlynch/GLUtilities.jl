@@ -5,10 +5,7 @@ function redirect_io(
 )
     open(stdout, "w+") do io
         open(stderr, "w+") do ioe
-            redirect_stdout(
-                () -> redirect_stderr(() -> f(), ioe),
-                io
-            )
+            redirect_stdout(() -> redirect_stderr(() -> f(), ioe), io)
         end
     end
 end

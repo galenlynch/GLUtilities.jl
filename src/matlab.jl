@@ -16,9 +16,7 @@ Convert matlab datevec into PreciseDateTime
 """
 function datevec_to_precisedatetime(datevec::Array{T}) where {T<:Real}
     add_seconds(
-        DateTime(
-            datevec[1], datevec[2], datevec[3], datevec[4], datevec[5], 0, 0
-        ),
-        datevec[6]
+        DateTime(datevec[1], datevec[2], datevec[3], datevec[4], datevec[5], 0, 0),
+        datevec[6],
     )
 end

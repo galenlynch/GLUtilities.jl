@@ -13,8 +13,7 @@ PreciseDateTime(dt::DateTime, args...) =
     PreciseDateTime(ZonedDateTime(dt, localzone()), args...)
 
 function -(x::PreciseDateTime, y::PreciseDateTime)
-    Millisecond(x.datetime - y.datetime).value * 1e-3 +
-        (x.nanos - y.nanos).value * 1e-9
+    Millisecond(x.datetime - y.datetime).value * 1e-3 + (x.nanos - y.nanos).value * 1e-9
 end
 
 convert(::Type{DateTime}, pdt::PreciseDateTime) = DateTime(pdt.datetime, Local)
@@ -84,8 +83,7 @@ end
 +(pdt::PreciseDateTime, p::TimePeriod) = pdt + convert(Nanosecond, p)
 
 add_nanos(pdt::PreciseDateTime, ns::Real) = pdt + Nanosecond(round(Int, ns))
-add_nanos(dt::Dates.AbstractDateTime, nanos::Real) =
-    add_nanos(PreciseDateTime(dt), nanos)
+add_nanos(dt::Dates.AbstractDateTime, nanos::Real) = add_nanos(PreciseDateTime(dt), nanos)
 add_seconds(dt::Dates.AbstractDateTime, sec::Real) = add_nanos(dt, sec * 10^9)
 
 function duration(start::PreciseDateTime, stop::PreciseDateTime)
@@ -93,9 +91,7 @@ function duration(start::PreciseDateTime, stop::PreciseDateTime)
     ns_diff.value / 10^9
 end
 
-function duration(
-    tstart::DateTime, microstart::Real, tend::DateTime, microend::Real
-)
+function duration(tstart::DateTime, microstart::Real, tend::DateTime, microend::Real)
     micro_diff = Dates.Microsecond(tend - tstart).value + (microend - microstart)
     micro_diff / 10^6
 end
@@ -138,9 +134,7 @@ show(io::IO, ::MIME"text/plain", r::TSRange) =
     print(io, "TSRange time stamp range:\n    ", r)
 
 function check_overlap(a::TSRange, b::TSRange)
-    check_overlap(
-        a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime
-    )
+    check_overlap(a.lower.datetime, a.upper.datetime, b.lower.datetime, b.upper.datetime)
 end
 
 duration(a::TSRange) = a.upper.datetime - a.lower.datetime # seconds
