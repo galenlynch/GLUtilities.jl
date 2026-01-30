@@ -20,7 +20,7 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 [compat]
 Distributions = "0.16 - 0.25"
 IterTools = "1"
-SignalIndices = "0.1.0"
+SignalIndices = "0.1.1"
 SortedIntervals = "0.1.0"
 Statistics = "1"
 TimeZones = "1"

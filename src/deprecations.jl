@@ -52,6 +52,9 @@ for fn in [
     :find_not_unique,
     :skipoftype,
     :skipnothing,
+    :allsame,
+    :anyeq,
+    :absdiff,
 ]
     depr_msg = "GLUtilities.$fn is deprecated, use SignalIndices.$fn instead."
     @eval begin

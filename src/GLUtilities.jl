@@ -28,7 +28,6 @@ import TimeZones: ZonedDateTime
 include("times.jl")
 include("files.jl")
 include("strings.jl")
-include("equality.jl")
 include("postgres.jl")
 include("array.jl")
 include("testing.jl")
