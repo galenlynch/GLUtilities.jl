@@ -3,6 +3,8 @@
 A collection of common utilities that my packages depend on, to be factored
 into existing libraries or more focused ones.
 
+Has nothing to do with open GL or graphics.
+
 ## Citing
 
 See [`CITATION.bib`](CITATION.bib) for the relevant reference(s).
