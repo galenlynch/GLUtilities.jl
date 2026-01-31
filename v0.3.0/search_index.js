@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"#GLUtilities","page":"Home","title":"GLUtilities","text":"Documentation for GLUtilities.\n\n","category":"section"},{"location":"#GLUtilities.only_matches-Tuple{Regex, AbstractArray{<:AbstractString}}","page":"Home","title":"GLUtilities.only_matches","text":"only_matches(reg::Regex, strs::AbstractArray{<:AbstractString})\n\nReturn all matches of reg in strs, skipping over non-matches.\n\n\n\n\n\n","category":"method"},{"location":"#GLUtilities.typemmap-Union{Tuple{N}, Tuple{A}, Tuple{Type{A}, NTuple{N, Int64}}} where {A<:AbstractArray, N}","page":"Home","title":"GLUtilities.typemmap","text":"Make a mmaped array of type A\n\n\n\n\n\n","category":"method"}]
+}
