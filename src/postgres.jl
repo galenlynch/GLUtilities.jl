@@ -81,11 +81,13 @@ function TSRange(rangestr::AbstractString)
     else
         error("Could not parse stop bound")
     end
-    TSRange(
-        RangeBound(start_t, start_inclusive),
-        RangeBound(stop_t, stop_inclusive)
-    )
+    TSRange(RangeBound(start_t, start_inclusive),
+            RangeBound(stop_t, stop_inclusive))
 end
+
+TSRange(tr::Interval{<:ZonedDateTime, B, E}) where {B, E} =
+    TSRange(RangeBound(first(tr), B == Closed),
+            RangeBound(last(tr), E == Closed))
 
 function postgres_tsrange_to_datetime_micros(timerange_str::AbstractString)
     tr = TSRange(timerange_str)

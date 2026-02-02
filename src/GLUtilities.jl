@@ -17,6 +17,8 @@ import Dates: AbstractDateTime
 
 import TimeZones: ZonedDateTime
 
+using Intervals: Interval, Closed
+
 import Base:
     isless,
     show,
